@@ -1,0 +1,29 @@
+{
+  "name": "ledmatrix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "rpiledmatrix"
+  ],
+  "author": "Michele Della Mea",
+  "license": "ISC",
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "compile-run": "^2.3.0",
+    "ejs": "^2.6.1",
+    "express": "^4.16.4",
+    "fibers": "^3.1.1",
+    "filepreview-es6": "^1.0.8",
+    "fs": "0.0.1-security",
+    "gyp": "^0.5.0",
+    "jimp": "^0.6.0",
+    "kerberos": "^1.1.2",
+    "nan": "^2.13.2",
+    "smart-promisify": "^1.0.5",
+    "text2png": "^2.1.0"
+  }
+}
