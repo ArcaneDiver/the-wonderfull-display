@@ -26,7 +26,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 childSub = child.fork('subIndex.js');
 
 function hexToRgb(hex) {
-    // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
     var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
     hex = hex.replace(shorthandRegex, function(m, r, g, b) {
         return r + r + g + g + b + b;
@@ -51,6 +50,9 @@ app.post('/', async function (req, res) { // bottone cliccato
 	/*childSub.on('message', (msg) => {
   		console.log('Message from child', msg);
 	});*/
+	
+	const s = req.body.speed;
+	
 
 	var item = req.body.userSearchInput;
 	var brig = req.body.userSearchBright;
@@ -58,7 +60,7 @@ app.post('/', async function (req, res) { // bottone cliccato
 	var r = hexToRgb(color).r;
 	var g = hexToRgb(color).g;
 	var b = hexToRgb(color).b;
-	var data = item.concat('Ĭ'+r+'Ĭ'+g+'Ĭ'+b+'Ĭ'+brig); // carattere realizzato con alt+300
+	var data = item.concat('Ĭ'+r+'Ĭ'+g+'Ĭ'+b+'Ĭ'+brig+'Ĭ'+s); // carattere realizzato con alt+300
 	console.log(data);
 	fs.writeFile('dataIn.txt', data, (err)=>{
 		if (err) throw err;
@@ -68,7 +70,7 @@ app.post('/', async function (req, res) { // bottone cliccato
 	var lengTextIn = item.length;
 	console.log('Dato inserito = ' + item + ' | Lunghezza stringa = '+lengTextIn);
 
-	/* stampa immagine *funzionante*
+	/* stampa immagine *funzionante* piu o meno
 	var imageBuff = fs.readFileSync("b.ppm");
 	matrix.setImageBuffer(imageBuff, 256, 32);	
 	matrix.draw();
