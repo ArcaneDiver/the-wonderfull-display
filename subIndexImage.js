@@ -36,8 +36,7 @@ while(1){
 	matrix.brightness(20);//rimettere arrText[4]
 	console.log(width, height);
 	matrix.setImageBuffer(imageBuff, width, height);
-	while(1){
-		x=0;
+	
 	while (x<width) {
 		
 		matrix.clear();	
@@ -47,7 +46,7 @@ while(1){
 		x++;
 		
 		delay(0);
-	}}
+	}
 	fs.close(openToRead);
 	fs.close(openToWrite);
 
