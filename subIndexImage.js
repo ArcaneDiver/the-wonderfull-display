@@ -6,16 +6,16 @@ var fs = require('fs');
 while(1){
 	
 	var x = 0;
-	var convert = child.spawnSync('convert', ['ciao.jpg', 'input.ppm']);
+	var convert = child.spawnSync('convert', ['img/input.jpg', 'img/input.ppm']);
 	
-	var imgBuff = fs.readFileSync('input.ppm');
+	var imgBuff = fs.readFileSync('img/input.ppm');
 	
 	var imgLength = imgBuff.length - 14;
 
 
-	var openToRead = fs.openSync('input.ppm', 'r');
-	var openToWrite = fs.openSync('output.ppm', 'w');
-	console.log(openToRead, openToWrite);
+	var openToRead = fs.openSync('img/input.ppm', 'r');
+	var openToWrite = fs.openSync('img/output.ppm', 'w');
+	
 	var realBuff = new Buffer(imgLength);
 
 	fs.readSync(openToRead, realBuff, 0, imgLength, 14, callBack);
@@ -24,7 +24,7 @@ while(1){
 	fs.writeSync(openToWrite, realBuff, 0, imgLength, 0, callBack);
 	//delay(5);
 
-	const imageBuff = fs.readFileSync("output.ppm");
+	const imageBuff = fs.readFileSync("img/output.ppm");
 	//console.log(realBuff.length, imageBuff.length);
 	//console.log(imageBuff.length, imageBuff);
 	var width, height;
@@ -33,8 +33,8 @@ while(1){
 	
 	//console.log(height, width, imageBuff.length);
 	
-	matrix.brightness(20);//rimettere arrText[4]
-	console.log(width, height);
+	matrix.brightness(50);
+	
 	matrix.setImageBuffer(imageBuff, width, height);
 	
 	while (x<width) {
@@ -45,7 +45,7 @@ while(1){
 		matrix.update();
 		x++;
 		
-		delay(0);
+		delay(10);
 	}
 	fs.close(openToRead);
 	fs.close(openToWrite);
@@ -61,11 +61,4 @@ function delay(ms){
 		ms_passed = ticks - cur_ticks;
 	}
 	
-}
-function removeHeader(i, o){
-	var i = 0;
-	
-}
-var callBack = function(err, bytesRead, buffer){
-	console.log('err: ', err);
 }
