@@ -13,3 +13,9 @@ Invece l'altra pagina permette di inserire un immagine (attualmente solo in form
 Il file index.js quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito al testo.
 
 Il file indexImage.js quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito alle immagini.
+
+
+
+
+#
+Michele Della Mea
