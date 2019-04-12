@@ -1,8 +1,7 @@
- var express = require('express');
+var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 var fs = require('fs');
-var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 
 
 const child = require('child_process')
@@ -70,13 +69,6 @@ app.post('/', async function (req, res) { // bottone cliccato
 	var lengTextIn = item.length;
 	console.log('Dato inserito = ' + item + ' | Lunghezza stringa = '+lengTextIn);
 
-	/* stampa immagine *funzionante* piu o meno
-	var imageBuff = fs.readFileSync("b.ppm");
-	matrix.setImageBuffer(imageBuff, 256, 32);	
-	matrix.draw();
-	matrix.update();	
-	*/
-	
 	
 	res.render('index', {});
 	
