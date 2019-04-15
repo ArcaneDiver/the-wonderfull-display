@@ -1,57 +1,99 @@
-<head>
-<link rel="shortcut icon" href="favicon.png" type="image/png"/>
-<title>𝐒𝐂𝐑𝐎𝐋𝐋𝐈𝐍𝐆 𝐓𝐄𝐗𝐓</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta charset="UTF-8">
-<style>
-body {font-family: Arial, Helvetica, sans-serif;}
-/* Full-width input fields */
-input[type=text]{
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-}
-/* Set a style for all buttons */
-button {
-  background-color: #4CAF50;
-  color: white;
-  padding: 14px 20px;
-  margin: 8px 0;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-}
-button:hover {
-  opacity: 0.8;
-}
- /* Fallback color */
-</style>
-</head>
-<body>
+<html>
+  <head>
+    <link rel="shortcut icon" href="favicon.png" type="image/png"/>
+    <title>𝐒𝐂𝐑𝐎𝐋𝐋𝐈𝐍𝐆</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <style>
+      body {
+        margin:0%;
+      }
+      div{
+        
+        color: white;
+        background-color:rgb(244, 67, 54);
+        height: 100%;
+        
+      }
+      p{
+        text-align: center;
+        font-size: 50px;
+        font-weight: 900;
+        padding: 1.5%;
+      }
+      button {
+        color: white;
+        padding: 0px;
+        margin: 0px;
+        border: none;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        font-size:40px;
+        font-weight: 900;
+      }
+      button.text{
+        background-color: #4CAF50;
+      }
+      button.image{
+        background-color: #2196F3;
+      }
 
-<div id="id01" class="modal">
-  
-  <form action="" method="POST">
-	<div class="container" align = "Center">
-		<label for="InNome"><b>Testo</b></label>
-		<input type="text" placeholder="Enter Username" name="userSearchInput" required>
-		<p>Inserisci il colore:</p>
-		<input type="color" name="userSearchColor" value="#4CAF50" required>
-		<p>Inserisci la luminosità</p>
-    <input type="number" name="userSearchBright" min = 0 max = 100 required>
-    <p>Selezionare velocità di scorrimento</p>
-    
-    <input type="radio" name="speed" value="max">Velocità massima<br>
-    <input type="radio" name="speed" value="medium" checked>Velocità media<br>
-    <input type="radio" name="speed" value="min">Velocità bassa<br>
-    
-		<button type="submit">Carica</button>
+      button:hover {
+        opacity: 0.8;
+      }
+      form{
+        margin: inherit;
+      }
+      ul{
+        margin: 0%;
+        padding: 0%;
+        height: 88%;
+      }
+      li{
+        
+        margin: 0px;
+      }
+      li.divide{
+        width: 100%;
+        height: 20%;
+      }
+      li.choose{
+        width: 49.46%;
+        height: 100%;
+        display:inline-block;
+      }
 
-	</div>
+      
+    </style>
+  </head>
+  <body>
+    <ul>
+      <li class="divide">
 
-</form>
-</div>
-</body>
+        <div>
+          <p>Choose the feature</p>
+        </div>
+      </li>
+      <li>
+
+        <ul>
+          <li class="choose">
+            <form action="/text">
+              <button type = "submit" class = "text">Scrolling Text</button>
+            </form>
+          </li>
+          <li class="choose">
+              <form action="/image">
+                <button type = "submit" class = "image">Scrolling Image</button>
+              </form>
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+
+
+  </body>
+</html>
+

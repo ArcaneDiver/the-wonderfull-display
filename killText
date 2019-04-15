@@ -1,1 +1,0 @@
-sudo kill -SIGKILL $(pidof sudo ../../rpi-rgb-led-matrix/examples-api-use/scrolling-text-example)
