@@ -12,9 +12,9 @@ Invece l'altra pagina permette di inserire un immagine (attualmente solo in form
 
 Attualmente l'utilizzo è il seguente:
 
---> Il file [index.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/index.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito al testo.
+--> Il file [index.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/blob/master/index.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito al testo.
 
---> Il file [indexImage.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/indexImage.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito alle immagini.
+--> Il file [indexImage.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/blob/master/indexImage.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito alle immagini.
 
 
 
