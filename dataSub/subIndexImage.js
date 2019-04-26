@@ -1,6 +1,13 @@
+/*
+
+    Autore: Michele Della Mea
+
+*/
+
+
 var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 var child = require('child_process');
-var matrix = new ledMatrix(32, 64, 1, 4, 20);
+var matrix = new ledMatrix(32, 64, 1, 4, 100);
 var fs = require('fs');
 
 while(1){
@@ -41,7 +48,6 @@ while(1){
     var realBuff = new Buffer(imgLength);
     //vado a riscrivere il file per rimuovere l'intestazione
     fs.readSync(openToRead, realBuff, 0, imgLength, i);
-    
     fs.writeSync(openToWrite, realBuff, 0, imgLength, 0);
     
     fs.close(openToRead);
@@ -54,8 +60,10 @@ while(1){
     width = (imageBuff.length / 3 ) / height;
     
     var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {});
+   
     var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 su linux
     const speed = arrImg[0];
+
 	var tDelay;
 	switch (speed) {
 		case 'max':
@@ -73,10 +81,10 @@ while(1){
     
     matrix.brightness(arrImg[1]);
     
-    matrix.setImageBuffer(imageBuff, width, height);
+    matrix.setImageBuffer(imageBuff, width, height);// imposto il buffer
     
     var x1= 256;
-    while(x1!=0){
+    while(x1!=0){ //serve per farlo *comparire* dal destra la prima volta
         matrix.clear();	
         matrix.draw(x1, 0, 256, 32, 0, 0, false, false);	
         matrix.update();
@@ -86,7 +94,7 @@ while(1){
        
     
     
-    while (x<width) {
+    while (x<width) { //serve per farlo *scomparire* a sinistra
         matrix.clear();	
         
         matrix.draw(0, 0, 256, 32, x, 0, false, false);	

@@ -1,3 +1,10 @@
+/*
+
+    Autore: Michele Della Mea
+
+*/
+
+
 var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 
 var matrix = new ledMatrix(32, 64, 1, 4, 20);

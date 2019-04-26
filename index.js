@@ -1,3 +1,10 @@
+/*
+
+    Autore: Michele Della Mea
+
+*/
+
+
 var express = require('express'); //framework che sta alla base
 var path = require('path'); //lo uso per i percorsi
 var bodyParser = require('body-parser'); //lo uso per leggere il testo
@@ -92,7 +99,8 @@ app.post('/image', function (req, res) {
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
 	var numImg = 0;
-	if(file.length > 0){
+	if(file.length > 0){ //capisco se cià che carico è un array di file o solo un singolo file
+
 		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
 	
 			file[i].mv('img/input' + i +'.jpg', function(err) {
@@ -107,6 +115,7 @@ app.post('/image', function (req, res) {
 		numImg = 1;
 		
 	}
+	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
 	
 	childSub = child.fork('dataSub/subIndexImage.js', {});
