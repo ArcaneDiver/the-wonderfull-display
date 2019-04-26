@@ -2,7 +2,7 @@ var express = require('express'); //framework che sta alla base
 var path = require('path'); //lo uso per i percorsi
 var bodyParser = require('body-parser'); //lo uso per leggere il testo
 var fs = require('fs'); // lo uso per leggere i file
-var fileUpload = require('express-fileupload'); // lo uso per leggere i file
+var fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
 
 var port = process.env.PORT || 80; //uso la porta 80 così che io possa scrivere direttamente 10.201.0.11 senza la porta
@@ -11,22 +11,22 @@ var app = express();
 
 
 app.set('views', path.join(__dirname, 'view'));
-app.set('view engine', 'ejs'); //i file html da inviare al sito
+app.set('view engine', 'ejs'); //cartella dei file html da inviare al sito
 app.use(express.static(path.join(__dirname, 'public'))); //le risorse usate dal sito
 
 
 app.use('/image', fileUpload());
-
 app.use('/text', bodyParser.json());
 app.use('/text', bodyParser.urlencoded({ extended: true }));
-
+app.use('/dataImage', bodyParser.json());
+app.use('/dataImage', bodyParser.urlencoded({ extended: true }));
 
 
 var childSub;
-//riavvio l'ultimo processo che è stato avviato
+//riavvio l'ultimo processo che è stato avviato 
 var resumeLastMatrix = fs.readFileSync('dataSub/lastMatrix.txt');
-
-switch (parseInt(resumeLastMatrix, 10)) {
+var actualMatrix = parseInt(resumeLastMatrix, 10); // converto da stringa a carattere
+switch (actualMatrix) {
 	case 1: // 1 = immagine
 		childSub = child.fork('dataSub/subIndexImage.js');
 		break;
@@ -40,39 +40,23 @@ switch (parseInt(resumeLastMatrix, 10)) {
 }
 
 
+/*
 
-app.get('/text', function (req, res) { // detecta entrata in /
-    res.render('indexText', {});
+	Gestione delle richieste da /image
+
+*/
+app.get('/dataImage', function(req, res){
+	res.render('indexImageData', {});
 })
 
-
-app.post('/text', function (req, res) { // bottone cliccato
-	
-	childSub.kill('SIGKILL');
-	
-	const item = req.body.userSearchInput;
-	const data = item.concat('Ĭ'+r+'Ĭ'+g+'Ĭ'+b+'Ĭ'+brig+'Ĭ'+s); // Ĭ è carattere UNICODE realizzato con alt+300
-	
-	const s = req.body.speed;
-
-	const brig = req.body.userSearchBright;
-	
-	const color = req.body.userSearchColor;
-	const r = hexToRgb(color).r;
-	const g = hexToRgb(color).g;
-	const b = hexToRgb(color).b;
-	
-	fs.writeFile('dataSub/dataIn.txt', data, (err)=>{
-		if (err) throw err;
-	}); 
-
-	childSub = child.fork('dataSub/subIndexText.js');
-	
-	
-	fs.writeFile('dataSub/lastMatrix.txt', 2);
-	
-	res.render('indexText', {});
+app.post('/dataImage', function(req, res){
+	var speed = req.body.speedImage;
+	var brig = req.body.brigImage;
+	var data = speed.concat('Ĭ'+brig);
+	fs.writeFileSync('dataSub/dataInImage.txt', data, {});
+	res.redirect('/image');
 });
+
 
 app.get('/image', function (req, res) { 
 	res.render('indexImage', {});
@@ -83,20 +67,82 @@ app.post('/image', function (req, res) {
 	
 	childSub.kill('SIGKILL');
 	
-    let file = req.files.imageToDisplay;
-    for(var i = 0; i<(file.length); i++){
-		file[i].mv('img/input' + i +'.jpg', function(err) {
-			if (err)
-			return res.send(err);
+	
+	var removeImageFromFolder = child.spawnSync('sudo', ['rm', 'img/*.jpg']); //cancello tutti i file immagine da dalla cartella
+	//removeImageFromFolder.kill('SIGKILL');
+	console.log(req.files);
+	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
+	
+	if(file.length > 0){
+		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
+	
+			file[i].mv('img/input' + i +'.jpg', function(err) {
+				if (err) return res.send(err);
+			});
+		}
+	} else {
+		file.mv('img/input' + 0 +'.jpg', function(err) {
+			if (err) return res.send(err);
 		});
 	}
+
 	
 	childSub = child.fork('dataSub/subIndexImage.js');
-	fs.writeFile('dataSub/lastMatrix.txt', 1);
+	fs.writeFile('dataSub/lastMatrix.txt', 1, {});
+
 	res.render('indexImage', {});
 });
 
-app.get('/', function(req,res){
+/*
+
+	Gestione delle richieste da /text
+
+*/
+
+app.get('/text', function (req, res) { 
+	res.render('indexText', {});
+})
+
+
+app.post('/text', function (req, res) {
+	
+	childSub.kill('SIGKILL'); //INVIA IL SEGNALE DI CHIUSRA
+	
+	
+	
+	const item = req.body.userSearchInput;
+
+	const s = req.body.speed;
+	
+	const brig = req.body.userSearchBright;
+	
+	const color = req.body.userSearchColor;
+	const r = hexToRgb(color).r;
+	const g = hexToRgb(color).g;
+	const b = hexToRgb(color).b;
+	
+	/*
+		-> Ĭ è carattere UNICODE realizzato con alt+300 il quale viene usato come divisore
+		-> Unisco tutto in un unica stringa che poi scriverò sul file
+
+	*/
+	
+	fs.writeFile('dataSub/dataInText.txt', item.concat('Ĭ'+r+'Ĭ'+g+'Ĭ'+b+'Ĭ'+brig+'Ĭ'+s), (err)=>{
+		if (err) throw err;
+	}); 
+	
+	
+	
+	childSub = child.fork('dataSub/subIndexText.js');
+	fs.writeFile('dataSub/lastMatrix.txt', 2, {});
+
+	
+	res.render('indexText', {});
+});
+
+
+
+app.get('/', function(req,res){ //pagina di base
 	res.render('index', {});
 });
 
@@ -106,9 +152,11 @@ app.all('*', function(req, res){//questo reindirizza tutte le pagine che non son
 });
 
 app.listen(port, function(){
-	var buff = 
+
 	console.log(`Server IP: 10.201.0.11`);
 });
+
+
 
 function hexToRgb(hex) {
 	var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;

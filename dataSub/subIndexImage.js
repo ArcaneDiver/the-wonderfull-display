@@ -5,66 +5,94 @@ var fs = require('fs');
 
 while(1){
 
-	//const nImageToDisplay = (fs.readdirSync('./img')).length; //leggo quanti file ci sono nella cartella /img
+	
 	var convert = child.spawnSync('sudo', ['convert','./img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']);
-	//var countImage = 0;
-	//var firstCycle = 0;
-	//while(countImage<(nImageToDisplay -1)){
-		var x = 0;
-		//var convert = child.spawnSync('convert', ['./img/input' + countImage + '.jpg', '-crop', '10000x32', './img/converted/input.ppm']);
-		
-		var imgBuff = fs.readFileSync('./img/converted/input.ppm');
-		
-		var imgLength = imgBuff.length - 14;
 	
-	
-		var openToRead = fs.openSync('./img/converted/input.ppm', 'r');
-		var openToWrite = fs.openSync('./img/converted/output.ppm', 'w');
-		
-		var realBuff = new Buffer(imgLength);
-	
-		fs.readSync(openToRead, realBuff, 0, imgLength, 14);
-		
-		fs.writeSync(openToWrite, realBuff, 0, imgLength, 0);
-		
-	
-		const imageBuff = fs.readFileSync("./img/converted/output.ppm");
-		
-		var width, height;
-		height = 32; //questo fa preso come assodato perche al momento non so come calcolarne le dimensioni
-		width = (imageBuff.length / 3 ) / height;
-		
-		//console.log(height, width, imageBuff.length);
-		
-		matrix.brightness(30);
-		
-		matrix.setImageBuffer(imageBuff, width, height);
-		//if(firstCycle == 0){
-			var x1= 256;
-			while(x1!=0){
-				matrix.clear();	
-				matrix.draw(x1, 0, 256, 32, 0, 0, false, false);	
-				matrix.update();
-				x1--;	
-				delay(10);
-			}
-			firstCycle = -1;
-		//}
-		
-		while (x<width) {
-			matrix.clear();	
-			
-			matrix.draw(0, 0, 256, 32, x, 0, false, false);	
-			matrix.update();
-			x++;
-			
-			delay(10);
-		}
-		fs.close(openToRead);
-		fs.close(openToWrite);
-		//countImage ++;
+    var x = 0;
+    
+    var imgBuff = fs.readFileSync('./img/converted/input.ppm');
+    
+    
+    
+    var openToRead = fs.openSync('./img/converted/input.ppm', 'r');
+    var openToWrite = fs.openSync('./img/converted/output.ppm', 'w');
+    var i = 0, numberOfDots = 0;
+    while(1){
+        var tempBuff = new Buffer(1);
+        fs.readSync(openToRead, tempBuff, 0, 1, i);
+        console.log(tempBuff);
+        i++;
+        if(tempBuff.lastIndexOf(10) == 0){
+            numberOfDots ++;
+            delay(1000)
+        }
+        if(numberOfDots == 3){
+            break;
+        }
+        
+    }
+    console.log(i);
+    var imgLength = imgBuff.length - i;
+    var realBuff = new Buffer(imgLength);
 
-	//}
+    fs.readSync(openToRead, realBuff, 0, imgLength, i);
+    
+    fs.writeSync(openToWrite, realBuff, 0, imgLength, 0);
+    
+    fs.close(openToRead);
+    fs.close(openToWrite);
+
+    const imageBuff = fs.readFileSync("./img/converted/output.ppm");
+    
+    var width, height;
+    height = 32; //questo perchè l'immagine viene tagliata automaticamente con altezza 32
+    width = (imageBuff.length / 3 ) / height;
+    console.log()
+    /*
+    const speed = arrText[5];
+	var tDelay;
+	switch (speed) {
+		case 'max':
+			tDelay = 0;
+			break;
+		case 'medium':
+			tDelay = 15;
+			break;
+		case 'min':
+			tDelay = 30;
+			break;
+		default:
+			break;
+    }
+    */
+    matrix.brightness(30);
+    
+    matrix.setImageBuffer(imageBuff, width, height);
+    
+    var x1= 256;
+    while(x1!=0){
+        matrix.clear();	
+        matrix.draw(x1, 0, 256, 32, 0, 0, false, false);	
+        matrix.update();
+        x1--;	
+        delay(10);
+    }
+       
+    
+    
+    while (x<width) {
+        matrix.clear();	
+        
+        matrix.draw(0, 0, 256, 32, x, 0, false, false);	
+        matrix.update();
+        x++;
+        
+        delay(10);
+    }
+
+    
+
+
 
 }
 function delay(ms){
