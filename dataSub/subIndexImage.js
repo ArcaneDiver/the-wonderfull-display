@@ -15,13 +15,17 @@ while(1){
     
     
     var openToRead = fs.openSync('./img/converted/input.ppm', 'r');
+
     var openToWrite = fs.openSync('./img/converted/output.ppm', 'w');
+
     var i = 0, numberOfDots = 0;
     while(1){
         var tempBuff = new Buffer(1);
-        fs.readSync(openToRead, tempBuff, 0, 1, i);
-                i++;
-        if(tempBuff.lastIndexOf(10) == 0){
+        fs.readSync(openToRead, tempBuff, 0, 1, i); //un bit alla volta
+        
+        i++; //conto quanto è lunga l'intestazione
+        
+        if(tempBuff.lastIndexOf(10) == 0){ //l'intestazione è composta da 3 punti di cui uno finale
             numberOfDots ++;
             
         }
@@ -33,8 +37,9 @@ while(1){
     }
    
     var imgLength = imgBuff.length - i;
-    var realBuff = new Buffer(imgLength);
 
+    var realBuff = new Buffer(imgLength);
+    //vado a riscrivere il file per rimuovere l'intestazione
     fs.readSync(openToRead, realBuff, 0, imgLength, i);
     
     fs.writeSync(openToWrite, realBuff, 0, imgLength, 0);
@@ -47,9 +52,10 @@ while(1){
     var width, height;
     height = 32; //questo perchè l'immagine viene tagliata automaticamente con altezza 32
     width = (imageBuff.length / 3 ) / height;
-    console.log()
-    /*
-    const speed = arrText[5];
+    
+    var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {});
+    var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 su linux
+    const speed = arrImg[0];
 	var tDelay;
 	switch (speed) {
 		case 'max':
@@ -64,8 +70,8 @@ while(1){
 		default:
 			break;
     }
-    */
-    matrix.brightness(30);
+    
+    matrix.brightness(arrImg[1]);
     
     matrix.setImageBuffer(imageBuff, width, height);
     
@@ -75,7 +81,7 @@ while(1){
         matrix.draw(x1, 0, 256, 32, 0, 0, false, false);	
         matrix.update();
         x1--;	
-        delay(10);
+        delay(tDelay);
     }
        
     
@@ -87,7 +93,7 @@ while(1){
         matrix.update();
         x++;
         
-        delay(10);
+        delay(tDelay);
     }
 
     

@@ -66,11 +66,15 @@ app.get('/image', function (req, res) {
 app.post('/image', function (req, res) { 
 	
 	childSub.kill('SIGKILL', {});
+
+	// la rimozione delle vecchie immagini è fondamentale
 	var i = 0
 	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
-	console.log(fileToRemove);
+	
 	while(fileToRemove > i){
-		const removeImageFromFolder = child.spawn('sudo', ['rm', './img/input' + i + '.jpg']); //cancello tutti i file immagine da dalla cartella
+		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
+		/* 
+		Per un eventuale debug
 		removeImageFromFolder.stdout.on('data', (data) => {
 			console.log(data.toString('utf8'));
 		});
@@ -82,6 +86,8 @@ app.post('/image', function (req, res) {
 		removeImageFromFolder.on('close', (code)=>{
 			console.log(code);
 		});
+		*/
+		i++;
 	}
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
@@ -103,7 +109,7 @@ app.post('/image', function (req, res) {
 	}
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
 	
-	childSub = child.fork('dataSub/subIndexImage.js');
+	childSub = child.fork('dataSub/subIndexImage.js', {});
 	fs.writeFile('dataSub/lastMatrix.txt', 1, {});
 
 	res.render('indexImage', {});
