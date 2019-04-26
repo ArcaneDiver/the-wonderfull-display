@@ -1,22 +1,24 @@
 # NODE rpi-led-rgb-matrix
 
-*Il risultato finale in teoria dovrà essere un server che una volta eseguito permettera di accedere a due differenti pagine.*
+La pagina del server principale è -> [/](http://10.201.0.11/) <- nella quale ci sono 2 bottoni che portano a due pagine:
 
-Una da all'utente la possibilità di inserire il proprio testo, scegliere il colore, scegliere la luminosità e impostare la velocità con cui il testo verrà fatto scorrere per le 4 matrici di led collegate al Raspberry.
+* Una da all'utente la possibilità di inserire il proprio testo, scegliere il colore, scegliere la luminosità e impostare la velocità con cui il testo verrà fatto scorrere per le 4 matrici di led collegate al Raspberry.
 
-
-Invece l'altra pagina permette di inserire un immagine (attualmente solo in formato .jpg) e l'immagine verrà fatta scorrere per le 4 matrici di led collegate al Raspberry a velocità costante.
-
-
-## Utilizzo
-
-Attualmente l'utilizzo è il seguente:
-
---> Il file [index.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/blob/master/index.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito al testo.
-
---> Il file [indexImage.js](https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix/blob/master/indexImage.js) quando viene eseguito hosta in locale un [server](10.201.0.11:3000) che sarà adibito alle immagini.
+* Invece l'altra pagina permette di inserire un quante immagini si vuole le quali saranno unite tra loro per formare un unica immagine che verrà fatta scorrere. Le immagini possono essere lunghe quanto si vuole ma se la loro altezza sarà maggiore di 32 pixel le immagini saranno tagliate in modo tale da rendere le immagini alte 32 pixel.
 
 
+## Avvio
+
+L'utilizzo è il seguente:
+
+* Partendo dalla cartella home dell utente:
+  ```bash
+  cd serverAllNode/server/
+  ```
+* Per far partire il server:
+  ```bash
+  sudo nodejs index.js
+  ```
 
 
 #
