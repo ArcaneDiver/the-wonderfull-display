@@ -65,27 +65,43 @@ app.get('/image', function (req, res) {
 
 app.post('/image', function (req, res) { 
 	
-	childSub.kill('SIGKILL');
+	childSub.kill('SIGKILL', {});
+	var i = 0
+	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
+	console.log(fileToRemove);
+	while(fileToRemove > i){
+		const removeImageFromFolder = child.spawn('sudo', ['rm', './img/input' + i + '.jpg']); //cancello tutti i file immagine da dalla cartella
+		removeImageFromFolder.stdout.on('data', (data) => {
+			console.log(data.toString('utf8'));
+		});
+		
+		removeImageFromFolder.stderr.on('data', (data) => {
+			
+			console.log(data.toString('utf8'));
+		});
+		removeImageFromFolder.on('close', (code)=>{
+			console.log(code);
+		});
+	}
 	
-	
-	var removeImageFromFolder = child.spawnSync('sudo', ['rm', 'img/*.jpg']); //cancello tutti i file immagine da dalla cartella
-	//removeImageFromFolder.kill('SIGKILL');
-	console.log(req.files);
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
-	
+	var numImg = 0;
 	if(file.length > 0){
 		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
 	
 			file[i].mv('img/input' + i +'.jpg', function(err) {
 				if (err) return res.send(err);
 			});
+			numImg = file.length;
 		}
 	} else {
 		file.mv('img/input' + 0 +'.jpg', function(err) {
 			if (err) return res.send(err);
 		});
+		numImg = 1;
+		
 	}
-
+	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
 	
 	childSub = child.fork('dataSub/subIndexImage.js');
 	fs.writeFile('dataSub/lastMatrix.txt', 1, {});
@@ -171,4 +187,5 @@ function hexToRgb(hex) {
 		b: parseInt(result[3], 16)
 	} : null;
 }
+
 

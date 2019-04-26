@@ -6,7 +6,7 @@ var fs = require('fs');
 while(1){
 
 	
-	var convert = child.spawnSync('sudo', ['convert','./img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']);
+    var convert = child.spawnSync('sudo', ['convert','./img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']);
 	
     var x = 0;
     
@@ -20,18 +20,18 @@ while(1){
     while(1){
         var tempBuff = new Buffer(1);
         fs.readSync(openToRead, tempBuff, 0, 1, i);
-        console.log(tempBuff);
-        i++;
+                i++;
         if(tempBuff.lastIndexOf(10) == 0){
             numberOfDots ++;
-            delay(1000)
+            
         }
+
         if(numberOfDots == 3){
             break;
         }
         
     }
-    console.log(i);
+   
     var imgLength = imgBuff.length - i;
     var realBuff = new Buffer(imgLength);
 
