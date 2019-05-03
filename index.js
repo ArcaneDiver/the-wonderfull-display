@@ -1,7 +1,5 @@
 /*
-
     Autore: Michele Della Mea
-
 */
 
 
@@ -12,7 +10,7 @@ var fs = require('fs'); // lo uso per leggere i file
 var fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
 
-var port = process.env.PORT || 80; //uso la porta 80 così che io possa scrivere direttamente 10.201.0.11 senza la porta
+var port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scrivere direttamente 10.201.0.11 senza la porta
 
 var app = express();
 
@@ -27,10 +25,13 @@ app.use('/text', bodyParser.json());
 app.use('/text', bodyParser.urlencoded({ extended: true }));
 app.use('/dataImage', bodyParser.json());
 app.use('/dataImage', bodyParser.urlencoded({ extended: true }));
+app.use('/delete', bodyParser.json());
+app.use('/delete', bodyParser.urlencoded({ extended: true }));
+
 
 
 var childSub;
-//riavvio l'ultimo processo che è stato avviato 
+//riavvio l'ultimo processo che � stato avviato 
 var resumeLastMatrix = fs.readFileSync('dataSub/lastMatrix.txt');
 var actualMatrix = parseInt(resumeLastMatrix, 10); // converto da stringa a carattere
 switch (actualMatrix) {
@@ -40,17 +41,33 @@ switch (actualMatrix) {
 	case 2: // 2 = testo
 		childSub = child.fork('dataSub/subIndexText.js');
 		break;
-	default:
+	default: //non dovrebbe accadere mai spero
 		console.log('no process to resume');
 		childSub = child.fork('dataSub/subIndexText.js'); //faccio ripartire questo senno da errore quando chiamo i post per la prima volta
 		break;
 }
 
+var actualImage[] = {0};
 
 /*
+	Gestione delle richeste da /delete
+*/
 
+app.post('/delete', function(req, res){
+	toDelete = req.body.action; //ottengo il nome dell' immagine da cancellare
+	for(int i = 0; i< actualImage.length; i++){
+		if(actualImage[i].name == toDelete){ //trovato cosa cancellare
+			console.log(actualImage[i]);   
+			actualImage = arrayRemove(actualImage, actualImage[i]);
+			break;
+		}
+	}
+
+
+})
+
+/*
 	Gestione delle richieste da /image
-
 */
 app.get('/dataImage', function(req, res){
 	res.render('indexImageData', {});
@@ -74,11 +91,11 @@ app.post('/image', function (req, res) {
 	
 	childSub.kill('SIGKILL', {});
 
-	// la rimozione delle vecchie immagini è fondamentale
+	// la rimozione delle vecchie immagini � fondamentale
 	var i = 0
 	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
 	
-	while(fileToRemove > i){
+	while(fileToRemove > i){ // questo perche child process fa schifo e non mi lascia fare sudo rm ./img/*.jpg
 		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
 		/* 
 		Per un eventuale debug
@@ -99,7 +116,7 @@ app.post('/image', function (req, res) {
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
 	var numImg = 0;
-	if(file.length > 0){ //capisco se cià che carico è un array di file o solo un singolo file
+	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
 
 		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
 	
@@ -125,9 +142,7 @@ app.post('/image', function (req, res) {
 });
 
 /*
-
 	Gestione delle richieste da /text
-
 */
 
 app.get('/text', function (req, res) { 
@@ -153,12 +168,11 @@ app.post('/text', function (req, res) {
 	const b = hexToRgb(color).b;
 	
 	/*
-		-> Ĭ è carattere UNICODE realizzato con alt+300 il quale viene usato come divisore
-		-> Unisco tutto in un unica stringa che poi scriverò sul file
-
+		-> I � carattere UNICODE realizzato con alt+300 il quale viene usato come divisore
+		-> Unisco tutto in un unica stringa che poi scriver� sul file
 	*/
 	
-	fs.writeFile('dataSub/dataInText.txt', item.concat('Ĭ'+r+'Ĭ'+g+'Ĭ'+b+'Ĭ'+brig+'Ĭ'+s), (err)=>{
+	fs.writeFile('dataSub/dataInText.txt', item.concat('I'+r+'I'+g+'I'+b+'I'+brig+'I'+s), (err)=>{
 		if (err) throw err;
 	}); 
 	
@@ -203,4 +217,10 @@ function hexToRgb(hex) {
 	} : null;
 }
 
+function arrayRemove(arr, value) {
 
+	return arr.filter(function(ele){
+	    return ele != value;
+	});
+   
+   }

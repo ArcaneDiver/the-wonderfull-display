@@ -7,13 +7,13 @@
 
 var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 var child = require('child_process');
-var matrix = new ledMatrix(32, 64, 1, 4, 100);
+var matrix = new ledMatrix(32, 64, 1, 4);
 var fs = require('fs');
 
 while(1){
 
 	
-    var convert = child.spawnSync('sudo', ['convert','./img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']);
+    var convert = child.spawnSync('sudo', ['convert', './img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
 	
     var x = 0;
     
@@ -27,7 +27,7 @@ while(1){
 
     var i = 0, numberOfDots = 0;
     while(1){
-        var tempBuff = new Buffer(1);
+        var tempBuff = new Buffer(1);//buffer da 1 Byte
         fs.readSync(openToRead, tempBuff, 0, 1, i); //un bit alla volta
         
         i++; //conto quanto è lunga l'intestazione
@@ -59,9 +59,9 @@ while(1){
     height = 32; //questo perchè l'immagine viene tagliata automaticamente con altezza 32
     width = (imageBuff.length / 3 ) / height;
     
-    var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {});
+    var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
    
-    var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 su linux
+    var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
     const speed = arrImg[0];
 
 	var tDelay;
@@ -79,9 +79,9 @@ while(1){
 			break;
     }
     
-    matrix.brightness(arrImg[1]);
+    matrix.brightness(arrImg[1]); //imposto la luminosità
     
-    matrix.setImageBuffer(imageBuff, width, height);// imposto il buffer
+    matrix.setImageBuffer(imageBuff, width, height);// setto l' immagine
     
     var x1= 256;
     while(x1!=0){ //serve per farlo *comparire* dal destra la prima volta
@@ -95,18 +95,14 @@ while(1){
     
     
     while (x<width) { //serve per farlo *scomparire* a sinistra
-        matrix.clear();	
         
+        matrix.clear();	
         matrix.draw(0, 0, 256, 32, x, 0, false, false);	
         matrix.update();
         x++;
         
         delay(tDelay);
     }
-
-    
-
-
 
 }
 function delay(ms){

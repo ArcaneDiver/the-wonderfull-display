@@ -15,8 +15,19 @@
             <input type="radio" name="speedImage" value="max">Velocità massima<br>
             <input type="radio" name="speedImage" value="medium" checked>Velocità media<br>
             <input type="radio" name="speedImage" value="min">Velocità bassa<br>
-    
-		<button type="submit">Carica</button>
+            <input type="checkbox" name="selectClock">Aggiungere data e ora alla fine?<br>
+		    <button type="submit">Carica</button>
+        </form>
+        <form action="/delete" method="POST">
+            <fieldset>
+                <legend> Lista immagini attualmente caricate </legend>
+                <% imageList.forEach( function (element) { %>
+                    <img src="<%= element.imgSrc %>">
+                    
+                    <button type="submit" name = "action" value="<%= element.name %>">x</button>
+                    <br>
+                <% }) %>
+            </fieldset>
         </form>
     </body>
 </html>

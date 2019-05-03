@@ -7,16 +7,16 @@
 
 var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 
-var matrix = new ledMatrix(32, 64, 1, 4, 20);
+var matrix = new ledMatrix(32, 64, 1, 4);
 var fs = require('fs');
 
 while(1){
 	//leggo i dati dal file
 	const textToScroll = fs.readFileSync('dataSub/dataInText.txt', 'utf8');
-	const arrText = textToScroll.split("Ĭ");
+	const arrText = textToScroll.split("Ĭ"); //alt+300 unicode
 	const lun = Object.keys(arrText[0]).length;
 	
-	var x = 256, y = 6, x1 = 256;
+	var x = 256, y = 0, x1 = 256;
 	var i = 1, k = 0;
 
 	const speed = arrText[5];
@@ -34,7 +34,7 @@ while(1){
 		default:
 			break;
 	}
-	//trasformo da stringa a intero
+	//trasformo da stringa a intero i valori per l'rgb
 	var r = parseInt(arrText[1], 10), g = parseInt(arrText[2], 10), b = parseInt(arrText[3], 10);
 	
 	const numTutSchermo = 32; //numero di caratteri rappresentabili con questo font e con 32 x 64
@@ -44,20 +44,17 @@ while(1){
 
 	matrix.brightness(arrText[4]);
 
-	while (x1 > (-8 * lun)) { // 26 perche ci sono gli spazi prima
-
+	while (x1 > (-8 * lun)) {
 		if((k % 256 == 0 ) && k != 0){ //aggiorno il quando sono a metà del buffer
 			var tmp = arrText[0].slice(numTutSchermo*(i-1), numTutSchermo*i);
 			toWrite = tmp.concat(arrText[0].slice(numTutSchermo*i, numTutSchermo*(i+1)));			
 			
 			x=0;
 			i++;
-		}
-		console.log(toWrite);		
-		
+		}	
+
 		matrix.clear();	
 		matrix.drawText(x, y, toWrite , './fonts/8x13.bdf', r, g, b);	
-		//matrix.setImageBuffer('text.ppm', 256, 32);	
 		matrix.update();
 		x--, x1--;
 		k++;
