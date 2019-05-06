@@ -11,16 +11,13 @@ La pagina del server principale è -> [/](http://10.201.0.11/) <- nella quale ci
 * Eseguire il comando:
    ```bash
    git clone https://github.com/ArcaneDiver/NODE_rpi-led-rgb-matrix
+   cd NODE_rpi-led-rgb-matrix
     ```
 
 ## Avvio
 
 L'utilizzo è il seguente:
 
-* Partendo dalla cartella home dell utente:
-  ```bash
-  cd NODE_rpi-led-rgb-matrix
-  ```
 * Per far partire il server:
   ```bash
   sudo nodejs index.js
