@@ -9,7 +9,7 @@ var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 var child = require('child_process');
 var matrix = new ledMatrix(32, 64, 1, 4);
 var fs = require('fs');
-
+var child = require('child_process');
 while(1){
 
 	
@@ -103,8 +103,24 @@ while(1){
         
         delay(tDelay);
     }
-
+    //if(Date.now() - timeStart > timeToScroll){
+        //break;
+    //}
 }
+
+var clock = child.spawn('sudo', ['../../rpi-rgb-led-matrix/examples-api-use/clock',  '--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', '/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
+/*
+process.once('SIGKILL', function () {
+    console.log('caugh');
+    clock.on('close', () => {});
+});*/
+process.once('SIGTERM', function () {
+    console.log('caugh');
+    clock.on('close', () => {});
+});
+clock.stderr.on('data', (data) =>{
+    console.log('hey un errore', data.toString('utf8'));
+})
 function delay(ms){
 
 	var cur_d = new Date();

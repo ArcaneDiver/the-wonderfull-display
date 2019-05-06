@@ -22,8 +22,9 @@
             <fieldset>
                 <legend> Lista immagini attualmente caricate </legend>
                 <% imageList.forEach( function (element) { %>
+                    <p><%= element.name%></p>
                     <img src="<%= element.imgSrc %>">
-                    
+                    <br>
                     <button type="submit" name = "action" value="<%= element.name %>">x</button>
                     <br>
                 <% }) %>

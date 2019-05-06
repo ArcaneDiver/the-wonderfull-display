@@ -9,11 +9,14 @@ var bodyParser = require('body-parser'); //lo uso per leggere il testo
 var fs = require('fs'); // lo uso per leggere i file
 var fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
-
-var port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scrivere direttamente 10.201.0.11 senza la porta
-
 var app = express();
 
+
+/*
+---------------------------------------------------------Inizializzazione variabili ecc.---------------------------------------------------------
+*/
+
+var port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scrivere direttamente 10.201.0.11 senza la porta
 
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'ejs'); //cartella dei file html da inviare al sito
@@ -47,23 +50,33 @@ switch (actualMatrix) {
 		break;
 }
 
-var actualImage = [{0}];
+var actualImage = [];
 
 var metaBase64 = "data:image/png;base64,";
+
+/*
+---------------------------------------------------------Fine Inizializzazione---------------------------------------------------------
+*/
+
+
+
 /*
 	Gestione delle richeste da /delete
 */
 
 app.post('/delete', function(req, res){
 	toDelete = req.body.action; //ottengo il nome dell' immagine da cancellare
+	console.log(toDelete, req.body);
 	for(var i = 0; i< actualImage.length; i++){
 		if(actualImage[i].name == toDelete){ //trovato cosa cancellare
-			console.log(actualImage[i]);   
-			actualImage = arrayRemove(actualImage, actualImage[i]);//cancello
+			
+			actualImage = arrayRemove(actualImage, actualImage[i]);//cancello nell' array
+			const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello effetivamente il file
 			break;
 		}
 	}
 	
+	res.redirect('/dataImage');
 
 
 })
@@ -71,8 +84,9 @@ app.post('/delete', function(req, res){
 /*
 	Gestione delle richieste da /image
 */
+
 app.get('/dataImage', function(req, res){
-	console.log(actualImage);
+	//console.log(actualImage);
 	res.render('indexImageData', {imageList: actualImage});
 })
 
@@ -124,26 +138,32 @@ app.post('/image', function (req, res) {
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
 
-	console.log(file);
+	//console.log(file);
 
 	var numImg = 0;
 
-	console.log(actualImage, actualImage[0]);
+	actualImage = []; // svuoto l'array
+
+	//console.log(actualImage, actualImage[0]);
 	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
-		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
-			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64'));
-			console.log(file[i].data);
-			console.log(file[i].data.toString('base64'));
-			file[i].mv('img/input' + i +'.jpg', function(err) {
+		for(var i = 0; i<(file.length); i++){ 
+			actualImage[i] = new Object(); //inizializzo l'oggetto
+			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+
+			//console.log(file[i].data);
+			//console.log(file[i].data.toString('base64'));
+
+			file[i].mv('img/input' + i +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
-
+			actualImage[i].name = 'img/input' + i +'.jpg';
 			numImg = file.length;
 		}
 	} else {
-		actualImage[0].imgSrc = metaBase64.concat(file.data.toString('base64'));
-		
-		file.mv('img/input' + 0 +'.jpg', function(err) {
+		actualImage[0] = new Object();
+		actualImage[0].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+
+		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
 
@@ -210,9 +230,6 @@ app.get('/', function(req,res){ //pagina di base
 });
 
 
-app.all('*', function(req, res){//questo reindirizza tutte le pagine che non sono / o /text o /image
-	res.redirect('/');
-});
 
 app.listen(port, function(){
 
