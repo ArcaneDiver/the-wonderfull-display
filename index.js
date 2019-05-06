@@ -47,21 +47,23 @@ switch (actualMatrix) {
 		break;
 }
 
-var actualImage[] = {0};
+var actualImage = [{0}];
 
+var metaBase64 = "data:image/png;base64,";
 /*
 	Gestione delle richeste da /delete
 */
 
 app.post('/delete', function(req, res){
 	toDelete = req.body.action; //ottengo il nome dell' immagine da cancellare
-	for(int i = 0; i< actualImage.length; i++){
+	for(var i = 0; i< actualImage.length; i++){
 		if(actualImage[i].name == toDelete){ //trovato cosa cancellare
 			console.log(actualImage[i]);   
-			actualImage = arrayRemove(actualImage, actualImage[i]);
+			actualImage = arrayRemove(actualImage, actualImage[i]);//cancello
 			break;
 		}
 	}
+	
 
 
 })
@@ -70,7 +72,8 @@ app.post('/delete', function(req, res){
 	Gestione delle richieste da /image
 */
 app.get('/dataImage', function(req, res){
-	res.render('indexImageData', {});
+	console.log(actualImage);
+	res.render('indexImageData', {imageList: actualImage});
 })
 
 app.post('/dataImage', function(req, res){
@@ -98,7 +101,9 @@ app.post('/image', function (req, res) {
 	while(fileToRemove > i){ // questo perche child process fa schifo e non mi lascia fare sudo rm ./img/*.jpg
 		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
 		/* 
-		Per un eventuale debug
+		==> Per un eventuale debug
+
+
 		removeImageFromFolder.stdout.on('data', (data) => {
 			console.log(data.toString('utf8'));
 		});
@@ -110,25 +115,38 @@ app.post('/image', function (req, res) {
 		removeImageFromFolder.on('close', (code)=>{
 			console.log(code);
 		});
+
 		*/
+
+
 		i++;
 	}
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
-	var numImg = 0;
-	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
 
+	console.log(file);
+
+	var numImg = 0;
+
+	console.log(actualImage, actualImage[0]);
+	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
 		for(var i = 0; i<(file.length); i++){ //carico nel filesystem tutti i file contenuti nell'array
-	
+			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64'));
+			console.log(file[i].data);
+			console.log(file[i].data.toString('base64'));
 			file[i].mv('img/input' + i +'.jpg', function(err) {
 				if (err) return res.send(err);
 			});
+
 			numImg = file.length;
 		}
 	} else {
+		actualImage[0].imgSrc = metaBase64.concat(file.data.toString('base64'));
+		
 		file.mv('img/input' + 0 +'.jpg', function(err) {
 			if (err) return res.send(err);
 		});
+
 		numImg = 1;
 		
 	}
