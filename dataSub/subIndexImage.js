@@ -16,19 +16,37 @@ while(1){
     var actualDate = new Date();
     
     var day = actualDate.getDate(), month = actualDate.getMonth() + 1, year= actualDate.getFullYear(), hour = actualDate.getHours(), minute = actualDate.getMinutes();
-    if(day < 10){
-        if(month < 10){
-            var timeString = '0' + day + '/' + '0' + month + '/' + year + '  ' + hour + ':' + minute;
-        } else {
-            var timeString = '0' + day + '/' + month + '/' + year + '  ' + hour + ':' + minute;
-        }
+    var timeString;
+    
+    if (day < 10) {
+        timeString = "0" + day;
+    } else {
+        timeString = day;
     }
-    console.log(timeString);
+    if (month < 10) {
+        timeString = timeString.concat('/0' + month);
+    } else {
+        timeString = timeString.concat('/' + month);
+    }
+    timeString = timeString.concat('/' + year + '   ');
+    
+    if (hour < 10) {
+        timeString = timeString.concat('0' + hour + ':');
+    } else {
+        timeString = timeString.concat(hour + ':');
+    }
+    if(minute < 10){
+        timeString = timeString.concat('0' + minute);
+    } else {
+        timeString = timeString.concat(minute);
+    }
+
+    
+
+
     var numberOfFile = fs.readFileSync('./dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
-    var createImageWithTime = child.spawn('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '19', '-size', '256x32', '-fill', 'blue', '-annotate', '0', timeString, './img/input' + numberOfFile + '.jpg']);
-    createImageWithTime.stderr.on('data', (data)=>{
-        console.log(code.toString('utf8'));
-    })
+    var createImageWithTime = child.spawnSync('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, './img/input' + numberOfFile + '.jpg']);
+    
     var convert = child.spawnSync('sudo', ['convert', './img/input*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
 	
     var x = 0;

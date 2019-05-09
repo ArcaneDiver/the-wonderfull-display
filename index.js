@@ -9,6 +9,7 @@ var bodyParser = require('body-parser'); //lo uso per leggere il testo
 var fs = require('fs'); // lo uso per leggere i file
 var fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
+var jsonfile = require('jsonfile');
 var app = express();
 
 
@@ -50,8 +51,8 @@ switch (actualMatrix) {
 		break;
 }
 
-var actualImage = [];
-
+var actualImage = require('./dataImage.json');
+console.log(actualImage);
 var metaBase64 = "data:image/png;base64,";
 
 /*
@@ -67,15 +68,15 @@ var metaBase64 = "data:image/png;base64,";
 app.post('/delete', function(req, res){
 	toDelete = req.body.action; //ottengo il nome dell' immagine da cancellare
 	console.log(toDelete, req.body);
-	for(var i = 0; i< actualImage.length; i++){
+	for(var i = 0; i< actualImage.dataOfImages.length; i++){
 		if(actualImage[i].name == toDelete){ //trovato cosa cancellare
 			
-			actualImage = arrayRemove(actualImage, actualImage[i]);//cancello nell' array
+			actualImage = arrayRemove(actualImage, actualImage.dataOfImages[i]);//cancello nell' array
 			const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello effetivamente il file
 			break;
 		}
 	}
-	
+	saveJson();
 	res.redirect('/dataImage');
 
 
@@ -142,13 +143,13 @@ app.post('/image', function (req, res) {
 
 	var numImg = 0;
 
-	actualImage = []; // svuoto l'array
+	actualImage.dataOfImages = []; // svuoto l'array
 
 	//console.log(actualImage, actualImage[0]);
 	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
 		for(var i = 0; i<(file.length); i++){ 
-			actualImage[i] = new Object(); //inizializzo l'oggetto
-			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+			actualImage.dataOfImages[i] = new Object(); //inizializzo l'oggetto
+			actualImage.dataOfImages[i].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
 			//console.log(file[i].data);
 			//console.log(file[i].data.toString('base64'));
@@ -156,20 +157,21 @@ app.post('/image', function (req, res) {
 			file[i].mv('img/input' + i +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
-			actualImage[i].name = 'img/input' + i +'.jpg';
+			actualImage.dataOfImages[i].name = 'img/input' + i +'.jpg';
 			numImg = file.length;
 		}
 	} else {
-		actualImage[0] = new Object();
-		actualImage[0].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+		actualImage.dataOfImages[0] = new Object();
+		actualImage.dataOfImages[0].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
 		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
-
+		actualImage.dataOfImages[0].name = 'img/input' + i +'.jpg';
 		numImg = 1;
 		
 	}
+	saveJson();
 	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
 	
@@ -253,9 +255,16 @@ function hexToRgb(hex) {
 }
 
 function arrayRemove(arr, value) {
-
+	console.log(arr);
 	return arr.filter(function(ele){
 	    return ele != value;
 	});
-   
-   }
+
+}
+
+function saveJson() {
+	
+	let data = JSON.stringify(actualImage, null, 2);
+	fs.writeFile('dataImage.json', data);
+
+}
