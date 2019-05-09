@@ -9,11 +9,27 @@ var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 var child = require('child_process');
 var matrix = new ledMatrix(32, 64, 1, 4);
 var fs = require('fs');
-var child = require('child_process');
+
 while(1){
 
-	
-    var convert = child.spawnSync('sudo', ['convert', './img/*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
+    // ImageMagick https://imagemagick.org/index.php
+    var actualDate = new Date();
+    
+    var day = actualDate.getDate(), month = actualDate.getMonth() + 1, year= actualDate.getFullYear(), hour = actualDate.getHours(), minute = actualDate.getMinutes();
+    if(day < 10){
+        if(month < 10){
+            var timeString = '0' + day + '/' + '0' + month + '/' + year + '  ' + hour + ':' + minute;
+        } else {
+            var timeString = '0' + day + '/' + month + '/' + year + '  ' + hour + ':' + minute;
+        }
+    }
+    console.log(timeString);
+    var numberOfFile = fs.readFileSync('./dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
+    var createImageWithTime = child.spawn('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '19', '-size', '256x32', '-fill', 'blue', '-annotate', '0', timeString, './img/input' + numberOfFile + '.jpg']);
+    createImageWithTime.stderr.on('data', (data)=>{
+        console.log(code.toString('utf8'));
+    })
+    var convert = child.spawnSync('sudo', ['convert', './img/input*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
 	
     var x = 0;
     
@@ -107,7 +123,7 @@ while(1){
         //break;
     //}
 }
-
+// Cosa problematica da risolvere !!!!!!!!!!!!!!!!!
 var clock = child.spawn('sudo', ['../../rpi-rgb-led-matrix/examples-api-use/clock',  '--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', '/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
 /*
 process.once('SIGKILL', function () {
