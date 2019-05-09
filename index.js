@@ -52,7 +52,7 @@ switch (actualMatrix) {
 }
 
 var actualImage = require('./dataImage.json');
-console.log(actualImage);
+//console.log(actualImage);
 var metaBase64 = "data:image/png;base64,";
 
 /*
@@ -69,9 +69,9 @@ app.post('/delete', function(req, res){
 	toDelete = req.body.action; //ottengo il nome dell' immagine da cancellare
 	console.log(toDelete, req.body);
 	for(var i = 0; i< actualImage.dataOfImages.length; i++){
-		if(actualImage[i].name == toDelete){ //trovato cosa cancellare
+		if(actualImage.dataOfImages[i].name == toDelete){ //trovato cosa cancellare
 			
-			actualImage = arrayRemove(actualImage, actualImage.dataOfImages[i]);//cancello nell' array
+			actualImage = arrayRemove(actualImage.dataOfImages, actualImage.dataOfImages[i]);//cancello nell' array
 			const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello effetivamente il file
 			break;
 		}
@@ -255,7 +255,7 @@ function hexToRgb(hex) {
 }
 
 function arrayRemove(arr, value) {
-	console.log(arr);
+	console.log(arr, value);
 	return arr.filter(function(ele){
 	    return ele != value;
 	});
