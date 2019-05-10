@@ -21,7 +21,7 @@
         <form action="/delete" method="POST">
             <fieldset>
                 <legend> Lista immagini attualmente caricate </legend>
-                <% imageList.dataOfImages.forEach( function (element) { %>
+                <% imageList.forEach( function (element) { %>
                     <p><%= element.name%></p>
                     <ul style="display: inline-flex; list-style-type: none">
                         <li>

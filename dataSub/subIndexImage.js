@@ -15,16 +15,17 @@ while(1){
     // ImageMagick https://imagemagick.org/index.php
     var actualDate = new Date();
     
-    var day = actualDate.getDate(), month = actualDate.getMonth() + 1, year= actualDate.getFullYear(), hour = actualDate.getHours(), minute = actualDate.getMinutes();
-    var timeString;
+    var day = actualDate.getDate().toString(), month = (actualDate.getMonth() + 1).toString(), year= actualDate.getFullYear().toString(), hour = actualDate.getHours().toString(), minute = actualDate.getMinutes().toString();
+    var timeStrinbg;
     
     if (day < 10) {
         timeString = "0" + day;
     } else {
         timeString = day;
     }
+
     if (month < 10) {
-        timeString = timeString.concat('/0' + month);
+        timeString = timeString.concat('/0', month);
     } else {
         timeString = timeString.concat('/' + month);
     }
