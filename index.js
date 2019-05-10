@@ -79,7 +79,7 @@ app.post('/delete', function(req, res){
 			break;
 		}
 	}
-	saveJson();
+	saveJson(); //salvo i cambiamenti anche nel file
 	res.redirect('/dataImage');
 
 
@@ -117,50 +117,33 @@ app.post('/image', function (req, res) {
 	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
 	
 	while(fileToRemove > i){ // questo perche child process fa schifo e non mi lascia fare sudo rm ./img/*.jpg
+
 		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
-		/* 
-		==> Per un eventuale debug
-
-
-		removeImageFromFolder.stdout.on('data', (data) => {
-			console.log(data.toString('utf8'));
-		});
 		
-		removeImageFromFolder.stderr.on('data', (data) => {
-			
-			console.log(data.toString('utf8'));
-		});
-		removeImageFromFolder.on('close', (code)=>{
-			console.log(code);
-		});
-
-		*/
-
-
 		i++;
 	}
 	
 	let file = req.files.imageToDisplay;//array di oggetti contenente tutti i file
 
-	//console.log(file);
+	console.log(file);
+	
 
 	var numImg = 0;
 
 	actualImage = []; // svuoto l'array
 
-	//console.log(actualImage, actualImage[0]);
-	if(file.length > 0){ //capisco se ci� che carico � un array di file o solo un singolo file
+	
+	if(file.length > 0){ //capisco se cio' che carico e' un array di file o solo un singolo file
 		for(var i = 0; i<(file.length); i++){ 
 			actualImage[i] = new Object(); //inizializzo l'oggetto
 			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-			//console.log(file[i].data);
-			//console.log(file[i].data.toString('base64'));
-
 			file[i].mv('img/input' + i +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
+
 			actualImage[i].name = 'img/input' + i +'.jpg';
+
 			numImg = file.length;
 		}
 	} else {
@@ -170,7 +153,9 @@ app.post('/image', function (req, res) {
 		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
+
 		actualImage[0].name = 'img/input' + i +'.jpg';
+
 		numImg = 1;
 		
 	}
