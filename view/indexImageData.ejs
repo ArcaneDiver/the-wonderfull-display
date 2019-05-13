@@ -25,7 +25,7 @@
                     <p><%= element.name%></p>
                     <ul style="display: inline-flex; list-style-type: none">
                         <li>
-                            <button type="submit" style="height: 32px; margin-right: 3px" name = "action" value="<%= element.name %>">x</button>
+                            <button type="submit" style="height: 32px; margin-right: 3px" name = "remove" value="<%= element.name %>">x</button>
                         </li>
                         <li>
                             <img style="width: auto" src="<%= element.imgSrc %>">
@@ -33,6 +33,7 @@
                         
                         
                     </ul>
+                    <button type ="submit" name ="add" value ="<%= element.posNumber %>" style = "margin: auto; display: block" > +   </button>
                 <% }) %>
             </fieldset>
         </form>
