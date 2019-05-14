@@ -110,28 +110,29 @@ app.post("/addImage", function(req,res){
 	console.log(numberOfFileToAdd, file.length);
 	for(var i = numImg-1; i>=posToAdd; i--){ //-1 perche lavoro con le posizioni
 		console.log(i, i+numberOfFileToAdd, numberOfFileToAdd);
-		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + (i + numberOfFileToAdd) + '.jpg'], {}); //*shifto* i nomi
+		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + parseInt(+i + +numberOfFileToAdd, 10) + '.jpg'], {}); //*shifto* i nomi
 		//shifto anche gli elementi nell'array
-		actualImage[i+numberOfFileToAdd] = new Object();
-		actualImage[i+numberOfFileToAdd] = actualImage[i];
+		actualImage[+i+numberOfFileToAdd] = new Object();
+		actualImage[+i+numberOfFileToAdd] = actualImage[i];
+		actualImage[+i+numberOfFileToAdd].posNumber = +actualImage[+i+numberOfFileToAdd].posNumber + +numberOfFileToAdd;
 	}
 
 	if(file.length > 0){ //capisco se cio' che carico e' un array di file o solo un singolo file
 
 		for(var i = 0; i<(file.length); i++){ 
 
-			actualImage[i+posToAdd] = new Object(); //inizializzo l'oggetto
+			actualImage[parseInt(+i + +posToAdd, 10)] = new Object(); //inizializzo l'oggetto
 
-			actualImage[i+posToAdd].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+			actualImage[parseInt(+i + +posToAdd, 10)].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-			file[i].mv('img/input' + (i + posToAdd) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
+			file[i].mv('img/input' + parseInt(+i + +posToAdd, 10) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
-
+			console.log(parseInt(+i + +posToAdd, 10), parseInt((+i + +posToAdd + 1), 10))
 			//actualImage[i].name = 'img/input' + i +'.jpg';
-			actualImage[i+posToAdd].name = file[i].name;
+			actualImage[parseInt(+i + +posToAdd, 10)].name = file[i].name;
 
-			actualImage[i+posToAdd].posNumber = i+posToAdd;
+			actualImage[parseInt(+i + +posToAdd, 10)].posNumber = parseInt((+i + +posToAdd + 1), 10);
 
 			
 		}
@@ -148,9 +149,9 @@ app.post("/addImage", function(req,res){
 		//actualImage[0].name = 'img/input' + i +'.jpg';
 		actualImage[posToAdd].name = file.name;
 
-		actualImage[posToAdd].posNumber = posToAdd;
+		actualImage[posToAdd].posNumber = parseInt(+posToAdd + +1, 10) ;
 
-		numImg = 1 + numImg;
+		numImg = +1 + +numImg;
 		
 	}
 	console.log(actualImage);
