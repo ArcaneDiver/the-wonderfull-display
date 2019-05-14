@@ -100,14 +100,16 @@ app.get('/addImage', function(req, res){
 app.post("/addImage", function(req,res){
 
 	let file = req.files.imageToDisplay;
+	console.log(file);
 	var numberOfFileToAdd = 0;
-	if(file.length < 0){ //questo serve per sapere di quante *posizioni* devo *shiftare* le immagini
-		numberOfFileToAdd = 1; //se non è un array deve essere per forza 1
+	if(file.length > 0){ //questo serve per sapere di quante *posizioni* devo *shiftare* le immagini
+		numberOfFileToAdd = file.length; //se non è un array deve essere per forza 1
 	} else {
-		numberOfFileToAdd = file.length;
+		numberOfFileToAdd = 1;
 	}
-	
+	console.log(numberOfFileToAdd, file.length);
 	for(var i = numImg-1; i>=posToAdd; i--){ //-1 perche lavoro con le posizioni
+		console.log(i, i+numberOfFileToAdd, numberOfFileToAdd);
 		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + (i + numberOfFileToAdd) + '.jpg'], {}); //*shifto* i nomi
 		//shifto anche gli elementi nell'array
 		actualImage[i+numberOfFileToAdd] = new Object();
@@ -120,14 +122,14 @@ app.post("/addImage", function(req,res){
 
 			actualImage[i+posToAdd] = new Object(); //inizializzo l'oggetto
 
-			actualImage[i+posToAdd].imgSrc = metaBase64.concat(file[i+posToAdd].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+			actualImage[i+posToAdd].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
 			file[i].mv('img/input' + (i + posToAdd) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
 
 			//actualImage[i].name = 'img/input' + i +'.jpg';
-			actualImage[i+posToAdd].name = file[i+posToAdd].name;
+			actualImage[i+posToAdd].name = file[i].name;
 
 			actualImage[i+posToAdd].posNumber = i+posToAdd;
 
@@ -139,23 +141,24 @@ app.post("/addImage", function(req,res){
 		actualImage[posToAdd] = new Object();
 		actualImage[posToAdd].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
+		file.mv('img/input' + posToAdd +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
 
 		//actualImage[0].name = 'img/input' + i +'.jpg';
 		actualImage[posToAdd].name = file.name;
 
-		actualImage[posToAdd].posNumber = i;
+		actualImage[posToAdd].posNumber = posToAdd;
 
 		numImg = 1 + numImg;
 		
 	}
+	console.log(actualImage);
 
 	saveJson();
 	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
-
+	
 	res.redirect('/dataImage');
 	//ora che ho shiftato posso inserire
 	
@@ -218,7 +221,7 @@ app.post('/image', function (req, res) {
 			//actualImage[i].name = 'img/input' + i +'.jpg';
 			actualImage[i].name = file[i].name;
 
-			actualImage[i].posNumber = i;
+			actualImage[i].posNumber = i + 1;
 
 			
 		}
@@ -235,7 +238,7 @@ app.post('/image', function (req, res) {
 		//actualImage[0].name = 'img/input' + i +'.jpg';
 		actualImage[0].name = file.name;
 
-		actualImage[0].posNumber = i;
+		actualImage[0].posNumber = i + 1;
 
 		numImg = 1;
 		
