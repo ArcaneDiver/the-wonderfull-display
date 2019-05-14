@@ -25,7 +25,7 @@ app.set('view engine', 'ejs'); //cartella dei file html da inviare al sito
 app.use(express.static(path.join(__dirname, 'public'))); //le risorse usate dal sito
 
 app.use('/image', fileUpload());
-
+app.use('/addImage', fileUpload());
 app.use('/text', bodyParser.json());
 app.use('/text', bodyParser.urlencoded({ extended: true }));
 app.use('/dataImage', bodyParser.json());
@@ -38,7 +38,7 @@ app.use('/delete', bodyParser.urlencoded({ extended: true }));
 var childSub;
 
 var numImg = fs.readFileSync('dataSub/numberOfFile.txt', {}); //numero attuale di immagini che scorrono
-
+var deleteTimeImage = child.spawnSync('sudo', ['rm', 'img/input' + numImg + '.jpg']);
 var posToAdd = 0;
 //riavvio l'ultimo processo che � stato avviato 
 var resumeLastMatrix = fs.readFileSync('dataSub/lastMatrix.txt', {});
@@ -73,15 +73,16 @@ var metaBase64 = "data:image/png;base64,";
 */
 
 app.post('/delete', function(req, res){
-	toDelete = req.body.remove; //ottengo il nome dell' immagine da cancellare
-	whereAdd = req.body.add; //ottengo la posizione dove aggiungere
+	var toDelete = req.body.remove; //ottengo il nome dell' immagine da cancellare
+	var whereAdd = req.body.add; //ottengo la posizione dove aggiungere
 
 	if(toDelete){ //se toDelete è definito allora cancello
 		deleteImage(toDelete);
 		
 	} else { //senno aggiungo
-		posToAdd = whereAdd + 1;
+		posToAdd = whereAdd;
 		res.redirect('/addImage');
+		return;
 	}
 	saveJson(); //salvo i cambiamenti anche nel file
 	res.redirect('/dataImage');
@@ -105,6 +106,59 @@ app.post("/addImage", function(req,res){
 	} else {
 		numberOfFileToAdd = file.length;
 	}
+	
+	for(var i = numImg-1; i>=posToAdd; i--){ //-1 perche lavoro con le posizioni
+		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + (i + numberOfFileToAdd) + '.jpg'], {}); //*shifto* i nomi
+		//shifto anche gli elementi nell'array
+		actualImage[i+numberOfFileToAdd] = new Object();
+		actualImage[i+numberOfFileToAdd] = actualImage[i];
+	}
+
+	if(file.length > 0){ //capisco se cio' che carico e' un array di file o solo un singolo file
+
+		for(var i = 0; i<(file.length); i++){ 
+
+			actualImage[i+posToAdd] = new Object(); //inizializzo l'oggetto
+
+			actualImage[i+posToAdd].imgSrc = metaBase64.concat(file[i+posToAdd].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+
+			file[i].mv('img/input' + (i + posToAdd) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
+				if (err) return res.send(err);
+			});
+
+			//actualImage[i].name = 'img/input' + i +'.jpg';
+			actualImage[i+posToAdd].name = file[i+posToAdd].name;
+
+			actualImage[i+posToAdd].posNumber = i+posToAdd;
+
+			
+		}
+		numImg = file.length + numImg;
+	} else {
+		
+		actualImage[posToAdd] = new Object();
+		actualImage[posToAdd].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
+
+		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
+			if (err) return res.send(err);
+		});
+
+		//actualImage[0].name = 'img/input' + i +'.jpg';
+		actualImage[posToAdd].name = file.name;
+
+		actualImage[posToAdd].posNumber = i;
+
+		numImg = 1 + numImg;
+		
+	}
+
+	saveJson();
+	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
+	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
+
+	res.redirect('/dataImage');
+	//ora che ho shiftato posso inserire
+	
 });
 app.get('/dataImage', function(req, res){
 	//console.log(actualImage);
@@ -166,9 +220,9 @@ app.post('/image', function (req, res) {
 
 			actualImage[i].posNumber = i;
 
-			numImg = file.length;
-
+			
 		}
+		numImg = file.length;
 	} else {
 		
 		actualImage[0] = new Object();
