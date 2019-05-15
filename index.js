@@ -38,7 +38,7 @@ app.use('/delete', bodyParser.urlencoded({ extended: true }));
 var childSub;
 
 var numImg = fs.readFileSync('dataSub/numberOfFile.txt', {}); //numero attuale di immagini che scorrono
-var deleteTimeImage = child.spawnSync('sudo', ['rm', 'img/input' + numImg + '.jpg']);
+
 var posToAdd = 0;
 //riavvio l'ultimo processo che � stato avviato 
 var resumeLastMatrix = fs.readFileSync('dataSub/lastMatrix.txt', {});
@@ -97,24 +97,26 @@ app.get('/addImage', function(req, res){
 	res.render('indexImageAdd', {});
 });
 
-app.post("/addImage", function(req,res){
+app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono perche senno le variabili sarebbere trattate come stringhe anzichè interi
 
 	let file = req.files.imageToDisplay;
-	console.log(file);
+	
 	var numberOfFileToAdd = 0;
 	if(file.length > 0){ //questo serve per sapere di quante *posizioni* devo *shiftare* le immagini
 		numberOfFileToAdd = file.length; //se non è un array deve essere per forza 1
 	} else {
 		numberOfFileToAdd = 1;
 	}
-	console.log(numberOfFileToAdd, file.length);
+	
 	for(var i = numImg-1; i>=posToAdd; i--){ //-1 perche lavoro con le posizioni
-		console.log(i, i+numberOfFileToAdd, numberOfFileToAdd);
+		//shifto gli elementi nel filesystem
 		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + parseInt(+i + +numberOfFileToAdd, 10) + '.jpg'], {}); //*shifto* i nomi
+		
 		//shifto anche gli elementi nell'array
-		actualImage[+i+numberOfFileToAdd] = new Object();
-		actualImage[+i+numberOfFileToAdd] = actualImage[i];
-		actualImage[+i+numberOfFileToAdd].posNumber = +actualImage[+i+numberOfFileToAdd].posNumber + +numberOfFileToAdd;
+		
+		actualImage[+i + +numberOfFileToAdd] = new Object();
+		actualImage[+i + +numberOfFileToAdd] = actualImage[i];
+		actualImage[+i + +numberOfFileToAdd].posNumber = +actualImage[+i+numberOfFileToAdd].posNumber + +numberOfFileToAdd;
 	}
 
 	if(file.length > 0){ //capisco se cio' che carico e' un array di file o solo un singolo file
@@ -160,8 +162,9 @@ app.post("/addImage", function(req,res){
 	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
 	
+
 	res.redirect('/dataImage');
-	//ora che ho shiftato posso inserire
+	
 	
 });
 app.get('/dataImage', function(req, res){
@@ -172,7 +175,16 @@ app.get('/dataImage', function(req, res){
 app.post('/dataImage', function(req, res){
 	var speed = req.body.speedImage;
 	var brig = req.body.brigImage;
-	var data = speed.concat('Ĭ'+brig);
+	var date = req.body.selectClock == 'on' ? 1 : 0;
+	var hour = parseInt(req.body.hours, 10);
+	var minute = parseInt(req.body.minutes, 10);
+	var resTime;
+	if(!hour && !minute) resTime = -1;
+	else {
+		resTime = (+hour * 60) + +minute;
+	}
+	console.log(resTime, hour, minute, req.body);
+	var data = speed.concat('Ĭ' + brig + 'Ĭ' + date + 'Ĭ' + resTime);
 	fs.writeFileSync('dataSub/dataInImage.txt', data, {});
 	res.redirect('/image');
 });
@@ -191,6 +203,7 @@ app.post('/image', function (req, res) {
 	// la rimozione delle vecchie immagini e' fondamentale
 	var i = 0
 	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
+	fileToRemove ++; //in modo tale da canellare anche il file con data e ora finale
 	
 	while(fileToRemove > i){ // questo perche child process fa schifo e non mi lascia fare sudo rm ./img/*.jpg
 
@@ -324,10 +337,6 @@ function deleteImage(toDelete){
 	numImg --;
 
 	fs.writeFileSync('dataSub/numberOfFile.txt', numImg); //rendo effettivi i cambiamenti anche nel file
-}
-
-function addImage(whereAdd){
-	
 }
 
 function hexToRgb(hex) {

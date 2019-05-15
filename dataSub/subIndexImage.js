@@ -9,45 +9,70 @@ var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 var child = require('child_process');
 var matrix = new ledMatrix(32, 64, 1, 4);
 var fs = require('fs');
-
+var timeStart = new Date().getTime();
 while(1){
+    var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
+   
+    var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
+    const speed = arrImg[0];
 
-    // ImageMagick https://imagemagick.org/index.php
-    var actualDate = new Date();
-    
-    var day = actualDate.getDate().toString(), month = (actualDate.getMonth() + 1).toString(), year= actualDate.getFullYear().toString(), hour = actualDate.getHours().toString(), minute = actualDate.getMinutes().toString();
-    var timeStrinbg;
-    
-    if (day < 10) {
-        timeString = "0" + day;
-    } else {
-        timeString = day;
+	var tDelay;
+	switch (speed) {
+		case 'max':
+			tDelay = 0;
+			break;
+		case 'medium':
+            tDelay = 15;
+            break;
+		case 'min':
+            tDelay = 30;
+            break;
+		default:
+            break;
     }
-
-    if (month < 10) {
-        timeString = timeString.concat('/0', month);
-    } else {
-        timeString = timeString.concat('/' + month);
-    }
-    timeString = timeString.concat('/' + year + '   ');
     
-    if (hour < 10) {
-        timeString = timeString.concat('0' + hour + ':');
-    } else {
-        timeString = timeString.concat(hour + ':');
-    }
-    if(minute < 10){
-        timeString = timeString.concat('0' + minute);
-    } else {
-        timeString = timeString.concat(minute);
-    }
-
+    matrix.brightness(arrImg[1]); //imposto la luminosità
     
-
-
     var numberOfFile = fs.readFileSync('./dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
-    var createImageWithTime = child.spawnSync('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, './img/input' + numberOfFile + '.jpg']);
     
+
+    if (parseInt(arrImg[2], 10)) {
+
+        var actualDate = new Date();
+        
+        var day = actualDate.getDate().toString(), month = (actualDate.getMonth() + 1).toString(), year = actualDate.getFullYear().toString(), hour = actualDate.getHours().toString(), minute = actualDate.getMinutes().toString();
+        var timeStrinbg;
+        
+        if (day < 10) {
+            timeString = "0" + day;
+        } else {
+            timeString = day;
+        }
+
+        if (month < 10) {
+            timeString = timeString.concat('/0', month);
+        } else {
+            timeString = timeString.concat('/' + month);
+        }
+
+        timeString = timeString.concat('/' + year + '   ');
+        
+        if (hour < 10) {
+            timeString = timeString.concat('0' + hour + ':');
+        } else {
+            timeString = timeString.concat(hour + ':');
+        }
+        if(minute < 10){
+            timeString = timeString.concat('0' + minute);
+        } else {
+            timeString = timeString.concat(minute);
+        }
+        var createImageWithTime = child.spawnSync('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, './img/input' + numberOfFile + '.jpg']);
+    } else {
+        var removeLastDate = child.spawnSync('sudo', ['rm', './img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno lo converte lo stesso
+    }
+    delay(1000);
+    // ImageMagick https://imagemagick.org/index.php
     var convert = child.spawnSync('sudo', ['convert', './img/input*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
 	
     var x = 0;
@@ -94,27 +119,6 @@ while(1){
     height = 32; //questo perchè l'immagine viene tagliata automaticamente con altezza 32
     width = (imageBuff.length / 3 ) / height;
     
-    var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
-   
-    var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
-    const speed = arrImg[0];
-
-	var tDelay;
-	switch (speed) {
-		case 'max':
-			tDelay = 0;
-			break;
-		case 'medium':
-			tDelay = 15;
-			break;
-		case 'min':
-			tDelay = 30;
-			break;
-		default:
-			break;
-    }
-    
-    matrix.brightness(arrImg[1]); //imposto la luminosità
     
     matrix.setImageBuffer(imageBuff, width, height);// setto l' immagine
     
@@ -138,24 +142,25 @@ while(1){
         
         delay(tDelay);
     }
-    //if(Date.now() - timeStart > timeToScroll){
-        //break;
-    //}
+    console.log(Date.now(), Date().getTime(), timeStart, arrImg[3] * 1000);
+    if(Date.now() - timeStart > (parseInt(arrImg[3], 10) * 1000)){
+        break;
+    }
 }
 // Cosa problematica da risolvere !!!!!!!!!!!!!!!!!
-var clock = child.spawn('sudo', ['../../rpi-rgb-led-matrix/examples-api-use/clock',  '--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', '/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
+//var clock = child.spawn('sudo', ['../../rpi-rgb-led-matrix/examples-api-use/clock',  '--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', '/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
 /*
 process.once('SIGKILL', function () {
     console.log('caugh');
     clock.on('close', () => {});
-});*/
+});
 process.once('SIGTERM', function () {
     console.log('caugh');
     clock.on('close', () => {});
 });
 clock.stderr.on('data', (data) =>{
     console.log('hey un errore', data.toString('utf8'));
-})
+})*/
 function delay(ms){
 
 	var cur_d = new Date();
