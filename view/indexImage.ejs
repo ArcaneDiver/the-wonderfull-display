@@ -19,6 +19,38 @@
         </div>
         <script src="js/custom-file-input.js"></script>
         <button type="submit">Carica</button>
+        
+        <br><br>
+        <div>
+          <p>
+            Dati :          
+          </p>
+          <br>
+          <ul>
+            <li>
+              <p>
+                Luminosità: <%= data.brig %> 
+              </p>
+            </li>
+            <li>
+                <p>
+                  Velocità di scorrimento: <%= data.speed %> 
+                </p>
+            </li>
+            <li>
+                <p>
+                  Minuti dopo i quali parte l'orologio: <%= data.resTime %> 
+                </p>
+            </li>
+            <li>
+                <p>
+                  Data inserita alla fine: 
+                  <%= data.date ? 'attiva' : 'disattivata' %> 
+                </p>
+            </li>
+          </ul>
+        </div>
+
         <p><b>Consiglio:</b><br>Le immagini saranno visualizzate in ordine alfabetico in base al nome</p>
 
         

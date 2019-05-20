@@ -36,9 +36,9 @@ while(1){
     var numberOfFile = fs.readFileSync('./dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
     
 
-    if (parseInt(arrImg[2], 10)) {
+    if (parseInt(arrImg[2], 10)) { //se è 1 nel file
 
-        var actualDate = new Date();
+        var actualDate = new Date(); //otengo la data e poi il resto dei dati
         
         var day = actualDate.getDate().toString(), month = (actualDate.getMonth() + 1).toString(), year = actualDate.getFullYear().toString(), hour = actualDate.getHours().toString(), minute = actualDate.getMinutes().toString();
         var timeStrinbg;
@@ -62,16 +62,21 @@ while(1){
         } else {
             timeString = timeString.concat(hour + ':');
         }
+
         if(minute < 10){
             timeString = timeString.concat('0' + minute);
         } else {
             timeString = timeString.concat(minute);
         }
+
         var createImageWithTime = child.spawnSync('sudo', ['convert', './img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, './img/input' + numberOfFile + '.jpg']);
     } else {
+
         var removeLastDate = child.spawnSync('sudo', ['rm', './img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno lo converte lo stesso
     }
     delay(1000);
+
+
     // ImageMagick https://imagemagick.org/index.php
     var convert = child.spawnSync('sudo', ['convert', './img/input*.jpg', '+append', '-crop', '100000x32+0+0', './img/converted/input.ppm']); //+append serve per concatenare le immagini
 	
@@ -103,7 +108,7 @@ while(1){
         
     }
    
-    var imgLength = imgBuff.length - i;
+    var imgLength = imgBuff.length - i; //tolgo l'intestazione dalla lunghezza del file
 
     var realBuff = new Buffer(imgLength);
     //vado a riscrivere il file per rimuovere l'intestazione
@@ -142,25 +147,38 @@ while(1){
         
         delay(tDelay);
     }
-    console.log(Date.now(), Date().getTime(), timeStart, arrImg[3] * 1000);
-    if(Date.now() - timeStart > (parseInt(arrImg[3], 10) * 1000)){
+
+
+    if((Date.now() - timeStart > parseInt(arrImg[3], 10)) && parseInt(arrImg[3], 10) != -1){
+
+        console.log('uscito tempo scaduto');
         break;
+    } else {
+        console.log('tempo rimanente: ' + (Date.now() - timeStart));
     }
 }
+
 // Cosa problematica da risolvere !!!!!!!!!!!!!!!!!
-//var clock = child.spawn('sudo', ['../../rpi-rgb-led-matrix/examples-api-use/clock',  '--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', '/home/pi/rpi-rgb-led-matrix/fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
+console.log('uscito');
+var clock = child.spawn('./dataSub/clock', ['--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', './fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
+
+console.log(clock.pid);
 /*
 process.once('SIGKILL', function () {
     console.log('caugh');
     clock.on('close', () => {});
-});
+});*/
+
 process.once('SIGTERM', function () {
-    console.log('caugh');
-    clock.on('close', () => {});
+    console.log('caught');
+    clock.kill('SIGKILL');
 });
+
+
 clock.stderr.on('data', (data) =>{
     console.log('hey un errore', data.toString('utf8'));
-})*/
+})
+
 function delay(ms){
 
 	var cur_d = new Date();

@@ -181,7 +181,7 @@ app.post('/dataImage', function(req, res){
 	var resTime;
 	if(!hour && !minute) resTime = -1;
 	else {
-		resTime = (+hour * 60) + +minute;
+		resTime = (((+hour * 60) + +minute) * +60) * 1000; //converto in minuti
 	}
 	console.log(resTime, hour, minute, req.body);
 	var data = speed.concat('Ĭ' + brig + 'Ĭ' + date + 'Ĭ' + resTime);
@@ -191,13 +191,24 @@ app.post('/dataImage', function(req, res){
 
 
 app.get('/image', function (req, res) { 
-	res.render('indexImage', {});
+	var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
+	var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
+	var data = {
+		brig: arrImg[1],
+		speed: arrImg[0],
+		resTime: arrImg[3] / 1000,
+		date: arrImg[2],
+
+	}
+	res.render('indexImage', {
+		data: data
+	});
 })
 
 
 app.post('/image', function (req, res) { 
 	
-	childSub.kill('SIGKILL', {});
+	childSub.kill('SIGTERM', {});
 
 	
 	// la rimozione delle vecchie immagini e' fondamentale
