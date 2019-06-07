@@ -38,11 +38,11 @@
             </li>
             <li>
                 <p>
-                  Minuti dopo i quali parte l'orologio:
-                  <% if(data.resTime < 0)
-                   (data.resTime < 0) ? "Tempo di scorrimento infinito" : data.resTime/60 
+                  Status dello scorrimento:
+                  <% if(data.resTime < 0) %>
+                  <%= (data.resTime < 0) ? "Tempo di scorrimento infinito" : 'Minuti rimanenti ' + data.resTime/60 %>
                    
-                   %> 
+                   
                 </p>
             </li>
             <li>

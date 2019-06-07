@@ -37,26 +37,26 @@ app.use('/delete', bodyParser.urlencoded({ extended: true }));
 
 var childSub;
 
-var numImg = fs.readFileSync('dataSub/numberOfFile.txt', {}); //numero attuale di immagini che scorrono
+var numImg = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', {}); //numero attuale di immagini che scorrono
 
 var posToAdd = 0;
 //riavvio l'ultimo processo che � stato avviato 
-var resumeLastMatrix = fs.readFileSync('dataSub/lastMatrix.txt', {});
+var resumeLastMatrix = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/lastMatrix.txt', {});
 var actualMatrix = parseInt(resumeLastMatrix, 10); // converto da stringa a carattere
 switch (actualMatrix) {
 	case 1: // 1 = immagine
-		childSub = child.fork('dataSub/subIndexImage.js');
+		childSub = child.fork('/home/pi/serverAllNode/server/dataSub/subIndexImage.js');
 		break;
 	case 2: // 2 = testo
-		childSub = child.fork('dataSub/subIndexText.js');
+		childSub = child.fork('/home/pi/serverAllNode/server/dataSub/subIndexText.js');
 		break;
 	default: //non dovrebbe accadere mai spero
 		
-		childSub = child.fork('dataSub/subIndexText.js'); //faccio ripartire questo senno da errore quando chiamo i post per la prima volta
+		childSub = child.fork('/home/pi/serverAllNode/server/dataSub/subIndexText.js'); //faccio ripartire questo senno da errore quando chiamo i post per la prima volta
 		break;
 }
 
-var actualImage = require('./dataImage.json');
+var actualImage = require('/home/pi/serverAllNode/server/dataImage.json');
 
 var metaBase64 = "data:image/png;base64,";
 
@@ -110,7 +110,7 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 	
 	for(var i = numImg-1; i>=posToAdd; i--){ //-1 perche lavoro con le posizioni
 		//shifto gli elementi nel filesystem
-		var rename = child.spawnSync('sudo', ['mv', './img/input' + i + '.jpg', 'img/input' + parseInt(+i + +numberOfFileToAdd, 10) + '.jpg'], {}); //*shifto* i nomi
+		var rename = child.spawnSync('sudo', ['mv', '/home/pi/serverAllNode/server/img/input' + i + '.jpg', '/home/pi/serverAllNode/server/img/input' + parseInt(+i + +numberOfFileToAdd, 10) + '.jpg'], {}); //*shifto* i nomi
 		
 		//shifto anche gli elementi nell'array
 		
@@ -127,7 +127,7 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 
 			actualImage[parseInt(+i + +posToAdd, 10)].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-			file[i].mv('img/input' + parseInt(+i + +posToAdd, 10) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
+			file[i].mv('/home/pi/serverAllNode/server/img/input' + parseInt(+i + +posToAdd, 10) +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
 			console.log(parseInt(+i + +posToAdd, 10), parseInt((+i + +posToAdd + 1), 10))
@@ -144,7 +144,7 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 		actualImage[posToAdd] = new Object();
 		actualImage[posToAdd].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-		file.mv('img/input' + posToAdd +'.jpg', function(err) { //inserisco nel filesystem l'immagine
+		file.mv('/home/pi/serverAllNode/server/img/input' + posToAdd +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
 
@@ -160,7 +160,7 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 
 	saveJson();
 	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
-	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
+	fs.writeFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', numImg, {});
 	
 
 	res.redirect('/dataImage');
@@ -185,13 +185,13 @@ app.post('/dataImage', function(req, res){
 	}
 	console.log(resTime, hour, minute, req.body);
 	var data = speed.concat('Ĭ' + brig + 'Ĭ' + date + 'Ĭ' + resTime);
-	fs.writeFileSync('dataSub/dataInImage.txt', data, {});
+	fs.writeFileSync('/home/pi/serverAllNode/server/dataSub/dataInImage.txt', data, {});
 	res.redirect('/image');
 });
 
 
 app.get('/image', function (req, res) { 
-	var dataForImageScrolling = fs.readFileSync('dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
+	var dataForImageScrolling = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
 	var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
 	var data = {
 		brig: arrImg[1],
@@ -213,12 +213,12 @@ app.post('/image', function (req, res) {
 	
 	// la rimozione delle vecchie immagini e' fondamentale
 	var i = 0
-	var fileToRemove = fs.readFileSync('dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
+	var fileToRemove = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', {}); //questo file DEVE esistere NON VA CANCELLATO o non funziona
 	fileToRemove ++; //in modo tale da canellare anche il file con data e ora finale
 	
 	while(fileToRemove > i){ // questo perche child process fa schifo e non mi lascia fare sudo rm ./img/*.jpg
 
-		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
+		const removeImageFromFolder = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + i + '.jpg'], {}); //cancello tutti i file immagine da dalla cartella
 		
 		i++;
 	}
@@ -239,7 +239,7 @@ app.post('/image', function (req, res) {
 
 			actualImage[i].imgSrc = metaBase64.concat(file[i].data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-			file[i].mv('img/input' + i +'.jpg', function(err) { //inserisco nel filesystem le immaggini
+			file[i].mv('/home/pi/serverAllNode/server/img/input' + i +'.jpg', function(err) { //inserisco nel filesystem le immaggini
 				if (err) return res.send(err);
 			});
 
@@ -256,7 +256,7 @@ app.post('/image', function (req, res) {
 		actualImage[0] = new Object();
 		actualImage[0].imgSrc = metaBase64.concat(file.data.toString('base64')); //converto il buffer dell immagine in base64 e gli aggiungo i metadati
 
-		file.mv('img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
+		file.mv('/home/pi/serverAllNode/server/img/input' + 0 +'.jpg', function(err) { //inserisco nel filesystem l'immagine
 			if (err) return res.send(err);
 		});
 
@@ -270,10 +270,10 @@ app.post('/image', function (req, res) {
 	}
 	saveJson();
 	//salvo il numero di file in modo tale da poterli eliminare al prossimo caricamento
-	fs.writeFileSync('dataSub/numberOfFile.txt', numImg, {});
+	fs.writeFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', numImg, {});
 	
-	childSub = child.fork('dataSub/subIndexImage.js', {});
-	fs.writeFile('dataSub/lastMatrix.txt', 1, {});
+	childSub = child.fork('/home/pi/serverAllNode/server/dataSub/subIndexImage.js', {});
+	fs.writeFile('/home/pi/serverAllNode/server/dataSub/lastMatrix.txt', 1, {});
 
 	res.redirect('dataImage');
 });
@@ -309,14 +309,14 @@ app.post('/text', function (req, res) {
 		-> Unisco tutto in un unica stringa che poi scriver� sul file
 	*/
 	
-	fs.writeFile('dataSub/dataInText.txt', item.concat('I'+r+'I'+g+'I'+b+'I'+brig+'I'+s), (err)=>{
+	fs.writeFile('/home/pi/serverAllNode/server/dataSub/dataInText.txt', item.concat('I'+r+'I'+g+'I'+b+'I'+brig+'I'+s), (err)=>{
 		if (err) throw err;
 	}); 
 	
 	
 	
-	childSub = child.fork('dataSub/subIndexText.js');
-	fs.writeFile('dataSub/lastMatrix.txt', 2, {});
+	childSub = child.fork('/home/pi/serverAllNode/server/dataSub/subIndexText.js');
+	fs.writeFile('/home/pi/serverAllNode/server/dataSub/lastMatrix.txt', 2, {});
 
 	
 	res.render('indexText', {});
@@ -341,13 +341,13 @@ function deleteImage(toDelete){
 			
 			actualImage = arrayRemove(actualImage, actualImage[i]);//cancello nell' array
 			
-			const removeImageFromFolder = child.spawnSync('sudo', ['rm', './img/input' + i + '.jpg'], {}); //cancello effetivamente il file
+			const removeImageFromFolder = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + i + '.jpg'], {}); //cancello effetivamente il file
 			break;
 		}
 	}
 	numImg --;
 
-	fs.writeFileSync('dataSub/numberOfFile.txt', numImg); //rendo effettivi i cambiamenti anche nel file
+	fs.writeFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', numImg); //rendo effettivi i cambiamenti anche nel file
 }
 
 function hexToRgb(hex) {
@@ -376,6 +376,6 @@ function arrayRemove(arr, value) {
 function saveJson() {
 	
 	let data = JSON.stringify(actualImage, null, 2);
-	fs.writeFile('dataImage.json', data);
+	fs.writeFile('/home/pi/serverAllNode/server/dataImage.json', data);
 
 }

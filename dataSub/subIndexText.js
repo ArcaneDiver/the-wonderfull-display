@@ -12,7 +12,7 @@ var fs = require('fs');
 
 while(1){
 	//leggo i dati dal file
-	const textToScroll = fs.readFileSync('dataSub/dataInText.txt', 'utf8');
+	const textToScroll = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/dataInText.txt', 'utf8');
 	const arrText = textToScroll.split("Ĭ"); //alt+300 unicode
 	const lun = Object.keys(arrText[0]).length;
 	
@@ -54,7 +54,7 @@ while(1){
 		}	
 
 		matrix.clear();	
-		matrix.drawText(x, y, toWrite , './fonts/8x13.bdf', r, g, b);	
+		matrix.drawText(x, y, toWrite , '/home/pi/serverAllNode/server/fonts/8x13.bdf', r, g, b);	
 		matrix.update();
 		x--, x1--;
 		k++;
