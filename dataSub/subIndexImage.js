@@ -153,31 +153,16 @@ while(1){
 
         console.log('uscito tempo scaduto');
         break;
-    } else {
-        console.log('tempo rimanente: ' + (Date.now() - timeStart));
     }
 }
 
-// Cosa problematica da risolvere !!!!!!!!!!!!!!!!!
-console.log('uscito');
-var clock = child.spawn('./dataSub/clock', ['--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', './fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
-
-console.log(clock.pid);
-/*
-process.once('SIGKILL', function () {
-    console.log('caugh');
-    clock.on('close', () => {});
-});*/
+var clock = child.spawn('./dataSub/example/clock', ['--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', './fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
 
 process.once('SIGTERM', function () {
     console.log('caught');
     clock.kill('SIGKILL');
 });
 
-
-clock.stderr.on('data', (data) =>{
-    console.log('hey un errore', data.toString('utf8'));
-})
 
 function delay(ms){
 
