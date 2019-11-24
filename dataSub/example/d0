@@ -1,0 +1,1 @@
+sudo ./demo -D 0 --led-cols=64 --led-chain=2 --led-pixel-mapper=U-mapper;Rotate:90
