@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 body {
     margin:0%;
   }
@@ -56,3 +57,63 @@ body {
     height: 100%;
     display:inline-block;
   }
+=======
+body {
+    margin:0%;
+  }
+  div{
+    
+    color: white;
+    background-color:rgb(244, 67, 54);
+    height: 100%;
+    
+  }
+  p{
+    text-align: center;
+    font-size: 50px;
+    font-weight: 900;
+    padding: 1.5%;
+  }
+  button {
+    color: white;
+    padding: 0px;
+    margin: 0px;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+    font-size:40px;
+    font-weight: 900;
+  }
+  button.text{
+    background-color: #4CAF50;
+  }
+  button.image{
+    background-color: #2196F3;
+  }
+
+  button:hover {
+    opacity: 0.8;
+  }
+  form{
+    margin: inherit;
+  }
+  ul{
+    margin: 0%;
+    padding: 0%;
+    height: 88%;
+  }
+  li{
+    
+    margin: 0px;
+  }
+  li.divide{
+    width: 100%;
+    height: 20%;
+  }
+  li.choose{
+    width: 49.46%;
+    height: 100%;
+    display:inline-block;
+  }
+>>>>>>> 6287b2da7d9bbb953c26da81f72037aa5210b4d2

@@ -162,7 +162,6 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 		numImg = +1 + +numImg;
 		
 	}
-
 	console.log(actualImage);
 
 	saveJson();
