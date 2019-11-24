@@ -3,22 +3,22 @@
 */
 
 
-var express = require('express'); //framework che sta alla base
-var path = require('path'); //lo uso per i percorsi
-var bodyParser = require('body-parser'); //lo uso per leggere il testo
-var fs = require('fs'); // lo uso per leggere i file
-var fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
+const express = require('express'); //framework che sta alla base
+const path = require('path'); //lo uso per i percorsi
+const bodyParser = require('body-parser'); //lo uso per leggere il testo
+const fs = require('fs'); // lo uso per leggere i file
+const fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
-var jsonfile = require('jsonfile');
+const jsonfile = require('jsonfile');
 
-var app = express();
+const app = express();
 
 
 /*
 ---------------------------------------------------------Inizializzazione variabili etc.---------------------------------------------------------
 */
 
-var port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scrivere direttamente 10.201.0.11 senza la porta
+const port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scrivere direttamente 10.201.0.11 senza la porta
 
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'ejs'); //cartella dei file html da inviare al sito
@@ -41,8 +41,7 @@ var numImg = fs.readFileSync(path.resolve(__dirname, "./dataSub/numberOfFile.txt
 var posToAdd = 0;
 
 //riavvio l'ultimo processo che è stato avviato 
-var resumeLastMatrix = fs.readFileSync(path.resolve(__dirname, "./dataSub/lastMatrix.txt"), {});
-const actualMatrix = parseInt(resumeLastMatrix, 10); // converto da stringa a carattere
+const actualMatrix = parseInt(fs.readFileSync(path.resolve(__dirname, "./dataSub/lastMatrix.txt"), {}));
 
 switch (actualMatrix) {
 	case 1: // 1 = immagine
@@ -199,6 +198,7 @@ app.post('/dataImage', function(req, res){
 app.get('/image', function (req, res) { 
 	var dataForImageScrolling = fs.readFileSync(path.resolve(__dirname, "./dataSub/dataInImage.txt"), 'utf8', {}); //legge i dati per lo scorrimento
 	var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
+	
 	var data = {
 		brig: arrImg[1],
 		speed: arrImg[0],
@@ -206,6 +206,7 @@ app.get('/image', function (req, res) {
 		date: arrImg[2],
 
 	}
+	
 	res.render('indexImage', {
 		data: data
 	});
@@ -386,5 +387,4 @@ function saveJson() {
 	
 	const data = JSON.stringify(actualImage, null, 2);
 	fs.writeFile(path.resolve(__dirname, './dataImage.json'), data);
-
 }
