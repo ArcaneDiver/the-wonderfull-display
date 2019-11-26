@@ -5,12 +5,17 @@
 */
 
 
-var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
-var child = require('child_process');
-var matrix = new ledMatrix(32, 64, 1, 4);
-var fs = require('fs');
-var timeStart = new Date().getTime();
-while(1){
+const ledMatrix = require('easybotics-rpi-rgb-led-matrix');
+const child = require('child_process');
+const fs = require('fs');
+
+
+const matrix = new ledMatrix(32, 64, 1, 4);
+
+const timeStart = new Date().getTime();
+
+
+while (1) {
     var dataForImageScrolling = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
    
     var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode

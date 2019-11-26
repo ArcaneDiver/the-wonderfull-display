@@ -1,53 +1,70 @@
 <html>
-    <head>
-        <link rel="shortcut icon" href="favicon.png" type="image/png"/>
-        <title>𝐒𝐂𝐑𝐎𝐋𝐋𝐈𝐍𝐆 𝐈𝐌𝐀𝐆𝐄</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta charset="UTF-8">
-    </head>
-    <body>
-        <form action="" method="POST" align = "center">
-            <p>Inserisci la luminosità</p>
-            <input type="number" name="brigImage" min = 0 max = 100 required>
-            
-            <p>Selezionare velocità di scorrimento</p>
-            
-            <input type="radio" name="speedImage" value="max">Velocità massima<br>
-            <input type="radio" name="speedImage" value="medium" checked>Velocità media<br>
-            <input type="radio" name="speedImage" value="min">Velocità bassa<br>
-            <input type="checkbox" name="selectClock">Aggiungere data e ora alla fine?<br>
-            <div style="display: inline-flex; margin: auto; margin-top: 3px">
-                <span>Inserire 0 e 0 per far scorrere all'infinito</span>
-                <div style="display: inline-flex;">
-                    <input type="text" name = "hours" required>
-                    <span>Ore</span>
-                </div>
-                <p style="margin: auto; margin-left: 15px; margin-right: 15px">:</p>
-                <div style="display: inline-flex;">
-                    <input type="text" name = "minutes" required>
-                    <span>Minuti</span>
-                </div>
+
+<head>
+    <link rel="shortcut icon" href="favicon.png" type="image/png" />
+    <title>𝐒𝐂𝐑𝐎𝐋𝐋𝐈𝐍𝐆 𝐈𝐌𝐀𝐆𝐄</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <form action="" method="POST" align="center">
+        <p>Inserisci la luminosità</p>
+        <input type="number" name="brigImage" min=0 max=100 required>
+
+        <p>Selezionare velocità di scorrimento</p>
+
+        <input type="radio" name="speedImage" value="max">Velocità massima<br>
+        <input type="radio" name="speedImage" value="medium" checked>Velocità media<br>
+        <input type="radio" name="speedImage" value="min">Velocità bassa<br>
+
+        <input type="checkbox" name="selectClock">Aggiungere data e ora alla fine?<br>
+
+        <div style="display: inline-flex; margin: auto; margin-top: 3px">
+            <span>Inserire 0 e 0 per far scorrere all'infinito</span>
+            <div style="display: inline-flex;">
+                <input type="text" name="hours" required>
+                <span>Ore</span>
             </div>
-		    <button style="display: block; margin: auto; margin-top: 10px" type="submit">Carica</button>
-        </form>
-        <form action="/delete" method="POST">
-            <fieldset>
-                <legend> Lista immagini attualmente caricate </legend>
-                <% imageList.forEach( function (element) { %>
-                    <p><%= element.name%></p>
-                    <ul style="display: inline-flex; list-style-type: none">
-                        <li>
-                            <button type="submit" style="height: 32px; margin-right: 3px" name = "remove" value="<%= element.name %>">x</button>
-                        </li>
-                        <li>
-                            <img style="width: auto" src="<%= element.imgSrc %>">
-                        </li>
-                        
-                        
-                    </ul>
-                    <button type ="submit" name ="add" value ="<%= element.posNumber%>" style = "margin: auto; display: block" > +   </button>
-                <% }) %>
-            </fieldset>
-        </form>
-    </body>
+            <p style="margin: auto; margin-left: 15px; margin-right: 15px">:</p>
+            <div style="display: inline-flex;">
+                <input type="text" name="minutes" required>
+                <span>Minuti</span>
+            </div>
+        </div>
+
+        <button style="display: block; margin: auto; margin-top: 10px" type="submit">Carica</button>
+
+    </form>
+    <form action="/delete" method="POST">
+        <fieldset>
+            <legend> Lista immagini attualmente caricate </legend>
+            <% if(imageList !== undefined) { %>
+            <% imageList.forEach( function (element) { %>
+            <p><%= element.name%></p>
+            <ul style="display: inline-flex; list-style-type: none">
+                <li>
+                    <button type="submit" style="height: 32px; margin-right: 3px" name="remove"
+                        value="<%= element.name %>">x</button>
+                </li>
+                <li>
+                    <img style="width: auto" src="<%= element.imgSrc %>">
+                </li>
+
+
+            </ul>
+            <button type="submit" name="add" value="<%= element.posNumber%>" style="margin: auto; display: block"> +
+            </button>
+            <% }) %>
+            <% } else { %>
+            <button type="submit" name="add" value="0" style="margin: auto; display: block"> + </button>
+            <% } %>
+        </fieldset>
+    </form>
+    <script>
+
+        console.log(<% %>);
+    </script>
+</body>
+
 </html>

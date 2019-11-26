@@ -9,7 +9,9 @@ const bodyParser = require('body-parser'); //lo uso per leggere il testo
 const fs = require('fs'); // lo uso per leggere i file
 const fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
-const jsonfile = require('jsonfile');
+const session = require(`express-session`);
+
+require('dotenv').config();
 
 const app = express();
 
@@ -22,8 +24,17 @@ const port = process.env.PORT || 80; //uso la porta 80 cos� che io possa scriv
 
 app.set('views', path.join(__dirname, 'view'));
 app.set('view engine', 'ejs'); //cartella dei file html da inviare al sito
+app.set('trust proxy', 1) // trust first proxy
+
 app.use(express.static(path.join(__dirname, 'public'))); //le risorse usate dal sito
 
+app.use(session({
+	secret: process.env.SESSION_SECRET,
+	resave: false,
+	saveUninitialized: true,
+	cookie: { secure: true }
+}))
+      
 app.use('/image', fileUpload());
 app.use('/addImage', fileUpload());
 app.use('/text', bodyParser.json());
@@ -32,7 +43,6 @@ app.use('/dataImage', bodyParser.json());
 app.use('/dataImage', bodyParser.urlencoded({ extended: true }));
 app.use('/delete', bodyParser.json());
 app.use('/delete', bodyParser.urlencoded({ extended: true }));
-
 
 
 var childSub;
@@ -60,11 +70,22 @@ const actualImage = require(path.resolve(__dirname, "./dataImage.json"));
 
 const metaBase64 = "data:image/png;base64,";
 
+global.iot = {
+	childSub,
+	numImg,
+	posToAdd,
+	actualMatrix,
+	actualImage,
+	metaBase64
+}
+
 /*
 ---------------------------------------------------------Fine Inizializzazione---------------------------------------------------------
 */
 
+app.use('/^((?!auth).)*$/gm', (req, res, next) => {
 
+})
 
 /*
 

@@ -56,8 +56,10 @@ while(1){
 		matrix.clear();	
 		matrix.drawText(x, y, toWrite , '/home/pi/serverAllNode/server/fonts/8x13.bdf', r, g, b);	
 		matrix.update();
+
 		x--, x1--;
 		k++;
+		
 		delay(tDelay);
 	}
 
