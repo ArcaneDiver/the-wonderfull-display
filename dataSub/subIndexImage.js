@@ -77,7 +77,7 @@ while (1) {
         var createImageWithTime = child.spawnSync('sudo', ['convert', '/home/pi/serverAllNode/server/img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, '/home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']);
     } else {
 
-        var removeLastDate = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno lo converte lo stesso
+        var removeLastDate = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno la include lo stesso
     }
     delay(1000);
 
@@ -99,8 +99,8 @@ while (1) {
 
     var i = 0, numberOfDots = 0;
     while(1){
-        var tempBuff = new Buffer(1);//buffer da 1 Byte
-        fs.readSync(openToRead, tempBuff, 0, 1, i); //un bit alla volta
+        var tempBuff = new Buffer(1);// buffer da 1 Byte
+        fs.readSync(openToRead, tempBuff, 0, 1, i); // un bit alla volta
         
         i++; //conto quanto è lunga l'intestazione
         
@@ -118,6 +118,7 @@ while (1) {
     var imgLength = imgBuff.length - i; //tolgo l'intestazione dalla lunghezza del file
 
     var realBuff = new Buffer(imgLength);
+
     //vado a riscrivere il file per rimuovere l'intestazione
     fs.readSync(openToRead, realBuff, 0, imgLength, i);
     fs.writeSync(openToWrite, realBuff, 0, imgLength, 0);
