@@ -17,11 +17,18 @@
 		font-size: 4em
 	}
 	.horizontal-centered {
-		margin: auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		
 	}
 	.content {
 		font-weight: bold;
 		font-size: 2.5em;
+	}
+	a.btn {
+		border-radius: 0%;
+		cursor: pointer
 	}
 
 </style>
@@ -31,19 +38,13 @@
 			Scrolling Text
 		</div>
 	</div>
-	<div class="row project-body bg-success content">
-		<div class="col-6 content">
-			<div class="h-100">
-				<div class="horizontal-centered">
-						Text
-
-				</div>
-			</div>
-				
-		</div>
-		<div class="col-6 horizontal-centered content">
-				Image
-		</div>
+	<div class="row project-body content">
+		<a href="/text" class="col-6 horizontal-centered content btn btn-success">
+			Text
+		</a>
+		<a href="/dataImage" class="col-6 horizontal-centered content btn btn-danger">
+			Image
+		</a>
 	</div>
 </div>
 <%- include("template/footer"); %>

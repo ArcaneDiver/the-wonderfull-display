@@ -1,6 +1,7 @@
-/*
-    Autore: Michele Della Mea
-*/
+
+/**
+ * @author Michele Della MEa
+ */
 
 
 const express = require('express'); //framework che sta alla base
@@ -9,11 +10,14 @@ const bodyParser = require('body-parser'); //lo uso per leggere il testo
 const fs = require('fs'); // lo uso per leggere i file
 const fileUpload = require('express-fileupload'); // lo uso per leggere i file dal sito
 const child = require('child_process') // lo uso per i processi figli
-const session = require(`express-session`);
+const session = require(`express-session`); // Autenticazione
+const morgan = require(`morgan`); // DEV
 
 require('dotenv').config();
+require("util").inspect.defaultOptions.depth = null; // In Node.JS i console.log non sono ricorsivi, con questo parametro sì
 
 const app = express();
+
 
 
 /*
@@ -28,13 +32,15 @@ app.set('trust proxy', 1) // trust first proxy
 
 app.use(express.static(path.join(__dirname, 'public'))); //le risorse usate dal sito
 
+
 app.use(session({
 	secret: process.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: true,
-	cookie: { secure: true }
+	cookie: { secure: process.env.NODE_ENV === `production` ? true : false }
 }))
-      
+app.use(morgan(`dev`));
+
 app.use('/image', fileUpload());
 app.use('/addImage', fileUpload());
 app.use('/text', bodyParser.json());
@@ -43,6 +49,8 @@ app.use('/dataImage', bodyParser.json());
 app.use('/dataImage', bodyParser.urlencoded({ extended: true }));
 app.use('/delete', bodyParser.json());
 app.use('/delete', bodyParser.urlencoded({ extended: true }));
+app.use("/login_check", bodyParser.urlencoded({ extended: true }));
+
 
 
 var childSub;
@@ -56,17 +64,31 @@ const actualMatrix = parseInt(fs.readFileSync(path.resolve(__dirname, "./dataSub
 switch (actualMatrix) {
 	case 1: // 1 = immagine
 		childSub = child.fork(path.resolve(__dirname, "./dataSub/subIndexImage.js"));
+		childSub.on("error", console.error)
 		break;
 	case 2: // 2 = testo
 		childSub = child.fork(path.resolve(__dirname, "./dataSub/subIndexText.js"));
+		childSub.on("error", console.error)
 		break;
 	default: //non dovrebbe accadere mai spero
 		
 		childSub = child.fork(path.resolve(__dirname, "./dataSub/subIndexText.js")); //faccio ripartire questo senno da errore quando chiamo i post per la prima volta
+		childSub.on("error", console.error)
 		break;
 }
 
-const actualImage = require(path.resolve(__dirname, "./dataImage.json"));
+
+let actualImage = [];
+
+// Tento di leggere il file dataImage se fallisco cancello le immagini precedentemente caricate
+try {
+	actualImage = require(path.resolve(__dirname, "./dataImage.json"));
+	if (actualImage.length === undefined) throw new Error();
+} catch (err) {
+	cleanImageFolder();
+	numImg = 0;
+}
+
 
 const metaBase64 = "data:image/png;base64,";
 
@@ -79,14 +101,40 @@ global.iot = {
 	metaBase64
 }
 
+console.log(iot);
 /*
 ---------------------------------------------------------Fine Inizializzazione---------------------------------------------------------
 */
 
-app.use('/^((?!auth).)*$/gm', (req, res, next) => {
 
+
+app.use((req, res, next) => {
+	console.log(req.originalUrl);
+
+	if (!req.session.logged && (req.originalUrl !== "/login" && req.originalUrl !== "/login_check")) {
+		console.log("going to /login", "path", req.originalUrl !== "/login", "session_token", !req.session.logged);
+		res.status(401).redirect(`/login`);
+		
+	} else {
+		next();
+	}
 })
 
+app.get(`/login`, (req, res) => {
+	res.status(200).render(`login`);
+});
+
+app.post(`/login_check`, (req, res) => {
+
+	console.log(req.body.password, "VS", process.env.PW);
+
+	if (req.body.password === process.env.PW) {
+		req.session.logged = true;
+		res.status(200).redirect(`/`);
+	} else {
+		res.status(403).redirect("/login");
+	}
+})
 /*
 
 	+ Gestione delle richeste da /delete
@@ -102,18 +150,18 @@ app.post('/delete', function(req, res){
 		
 	} else { //senno aggiungo
 		posToAdd = whereAdd;
-		res.redirect('/addImage');
+		res.status(300).redirect('/addImage');
 		return;
 	}
 	saveJson(); //salvo i cambiamenti anche nel file
-	res.redirect('/dataImage');
+	res.status(300).redirect('/dataImage');
 })
 
 /*
 	Gestione delle richieste da /image
 */
 app.get('/addImage', function(req, res){
-	res.render('indexImageAdd', {});
+	res.status(200).render('indexImageAdd', {});
 });
 
 app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono perche senno le variabili sarebbere trattate come stringhe anzichè interi
@@ -189,13 +237,13 @@ app.post("/addImage", function(req,res){ // le operarazioni come +x + +y sono pe
 	fs.writeFileSync(path.resolve(__dirname, './dataSub/numberOfFile.txt'), numImg, {});
 	
 
-	res.redirect('/dataImage');
+	res.status(300).redirect('/dataImage');
 	
 	
 });
 app.get('/dataImage', function(req, res){
 	//console.log(actualImage);
-	res.render('indexImageData', {imageList: actualImage});
+	res.status(200).render('indexImageData', {imageList: actualImage});
 });
 
 app.post('/dataImage', function(req, res){
@@ -205,14 +253,17 @@ app.post('/dataImage', function(req, res){
 	var hour = parseInt(req.body.hours, 10);
 	var minute = parseInt(req.body.minutes, 10);
 	var resTime;
+
 	if(!hour && !minute) resTime = -1;
 	else {
 		resTime = (((+hour * 60) + +minute) * +60) * 1000; //converto in minuti
 	}
 	console.log(resTime, hour, minute, req.body);
+
 	var data = speed.concat('Ĭ' + brig + 'Ĭ' + date + 'Ĭ' + resTime);
 	fs.writeFileSync(path.resolve(__dirname, './dataSub/dataInImage.txt'), data, {});
-	res.redirect('/image');
+	
+	res.status(300).redirect('/image');
 });
 
 
@@ -228,7 +279,7 @@ app.get('/image', function (req, res) {
 
 	}
 	
-	res.render('indexImage', {
+	res.status(200).render('indexImage', {
 		data: data
 	});
 })
@@ -306,7 +357,7 @@ app.post('/image', function (req, res) {
 	childSub = child.fork(path.resolve(__dirname, './dataSub/subIndexImage.js'), {});
 	fs.writeFile(path.resolve(__dirname, './dataSub/lastMatrix.txt'), 1, {});
 
-	res.redirect('dataImage');
+	res.status(300).redirect('dataImage');
 });
 
 /*
@@ -314,7 +365,7 @@ app.post('/image', function (req, res) {
 */
 
 app.get('/text', function (req, res) { 
-	res.render('indexText', {});
+	res.status(200).render('indexText', {});
 })
 
 
@@ -350,19 +401,19 @@ app.post('/text', function (req, res) {
 	fs.writeFile(path.resolve(__dirname, './dataSub/lastMatrix.txt'), 2, {});
 
 	
-	res.render('indexText', {});
+	res.status(200).render('indexText', {});
 });
 
 
 
 app.get('/', function(req,res){ //pagina di base
-	res.render('index', {});
+	res.status(200).render('index', {});
 });
 
 
 
 app.listen(port, function(){
-	console.log(`Server IP: 10.201.0.11`);
+	console.log(`Server IP: 10.201.0.11 on port ${port}`);
 });
 
 function deleteImage(toDelete){
@@ -408,4 +459,13 @@ function saveJson() {
 	
 	const data = JSON.stringify(actualImage, null, 2);
 	fs.writeFile(path.resolve(__dirname, './dataImage.json'), data);
+}
+
+function cleanImageFolder() {
+	fs.readdirSync(path.resolve(__dirname, "./img"))
+		.filter(file => file.includes(`input`))
+		.map(file => path.resolve(__dirname, "./img")
+			.concat("/")
+			.concat(file))
+		.forEach(filepath => fs.unlinkSync(filepath));
 }

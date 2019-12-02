@@ -39,9 +39,9 @@ while (1) {
     matrix.brightness(arrImg[1]); //imposto la luminosità
     
     var numberOfFile = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
-    
+    ;    
 
-    if (parseInt(arrImg[2], 10)) { //se è 1 nel file
+    if (parseInt(arrImg[2])) { //se è 1 nel file
 
         var actualDate = new Date(); //otengo la data e poi il resto dei dati
         
@@ -74,7 +74,7 @@ while (1) {
             timeString = timeString.concat(minute);
         }
 
-        var createImageWithTime = child.spawnSync('sudo', ['convert', './home/pi/serverAllNode/server/img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, './home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']);
+        var createImageWithTime = child.spawnSync('sudo', ['convert', '/home/pi/serverAllNode/server/img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, '/home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']);
     } else {
 
         var removeLastDate = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno lo converte lo stesso
@@ -83,8 +83,10 @@ while (1) {
 
 
     // ImageMagick https://imagemagick.org/index.php
-    var convert = child.spawnSync('sudo', ['convert', './home/pi/serverAllNode/server/img/input*.jpg', '+append', '-crop', '100000x32+0+0', './home/pi/serverAllNode/server/img/converted/input.ppm']); //+append serve per concatenare le immagini
-	
+    // Converto tutte le immagini
+    var convert = child.spawnSync('sudo', ['convert', '/home/pi/serverAllNode/server/img/input*.jpg', '+append', '-crop', '100000x32+0+0', '/home/pi/serverAllNode/server/img/converted/input.ppm']); //+append serve per concatenare le immagini
+    
+    
     var x = 0;
     
     var imgBuff = fs.readFileSync('/home/pi/serverAllNode/server/img/converted/input.ppm');

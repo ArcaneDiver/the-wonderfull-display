@@ -1,0 +1,25 @@
+<%- include("template/header"); %>
+<style>
+        .form-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+        }
+
+        .form-container form {
+                padding: 5em;
+                
+        }
+</style>
+
+<div class="form-container">
+        <form action="/login_check" method="POST" class="border">
+                <div class="form-group">
+                        <label for="passwordInput">Password</label>
+                        <input type="password" class="form-control" name="password" id="passwordInput" placeholder="Password">
+                </div>
+        </form>
+</div>
+
+<%- include("template/footer"); %>

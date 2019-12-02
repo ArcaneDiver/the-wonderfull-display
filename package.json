@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start:dev": "sudo node index.js",
-    "start:prod": "pm2 start index.js"
+    "start:image": "sudo node dataSub/subIndexImage.js",
+    "start:prod": "npx cross-env pm2 start index.js"
   },
   "keywords": [
     "rpiledmatrix"
@@ -19,6 +20,10 @@
     "ejs": "^2.6.1",
     "express": "^4.16.4",
     "express-fileupload": "^1.1.4",
-    "express-session": "^1.17.0"
+    "express-session": "^1.17.0",
+    "morgan": "^1.9.1"
+  },
+  "devDependencies": {
+    "cross-env": "^6.0.3"
   }
 }
