@@ -1,14 +1,6 @@
-<html>
-
-<head>
-    <link rel="shortcut icon" href="favicon.png" type="image/png" />
-    <title>𝐒𝐂𝐑𝐎𝐋𝐋𝐈𝐍𝐆 𝐈𝐌𝐀𝐆𝐄</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
-</head>
-
-<body>
-    <form action="" method="POST" align="center">
+<%- include("template/header"); %>
+<div class="">
+    <form action="" method="POST" >
         <p>Inserisci la luminosità</p>
         <input type="number" name="brigImage" min=0 max=100 required>
 
@@ -34,35 +26,32 @@
         </div>
 
         <button style="display: block; margin: auto; margin-top: 10px" type="submit">Carica</button>
-
     </form>
-    <form action="/delete" method="POST">
-        <fieldset>
-            <legend> Lista immagini attualmente caricate </legend>
-            <% if(imageList.length > 0) { %>
-                <% imageList.forEach( function (element) { %>
-                <p><%= element.name%></p>
-                <ul style="display: inline-flex; list-style-type: none">
-                    <li>
-                        <button type="submit" style="height: 32px; margin-right: 3px" name="remove"
-                            value="<%= element.name %>">x</button>
-                    </li>
-                    <li>
-                        <img style="width: auto" src="<%= element.imgSrc %>">
-                    </li>
+</div>
+<form action="/delete" method="POST">
+    <fieldset>
+        <legend> Lista immagini attualmente caricate </legend>
+        <% if(imageList.length > 0) { %>
+        <% imageList.forEach( function (element) { %>
+        <p><%= element.name%></p>
+        <ul style="display: inline-flex; list-style-type: none">
+            <li>
+                <button type="submit" style="height: 32px; margin-right: 3px" name="remove"
+                    value="<%= element.name %>">x</button>
+            </li>
+            <li>
+                <img style="width: auto" src="<%= element.imgSrc %>">
+            </li>
 
 
-                </ul>
-                <button type="submit" name="add" value="<%= element.posNumber%>" style="margin: auto; display: block"> +
-                </button>
-                <% }) %>
-            <% } else { %>
-                <button type="submit" name="add" value="0" style="margin: auto; display: block"> + </button>
-            <% } %>
-        </fieldset>
-    </form>
-    <script>
-    </script>
-</body>
+        </ul>
+        <button type="submit" name="add" value="<%= element.posNumber%>" style="margin: auto; display: block"> +
+        </button>
+        <% }) %>
+        <% } else { %>
+        <button type="submit" name="add" value="0" style="margin: auto; display: block"> + </button>
+        <% } %>
+    </fieldset>
+</form>
 
-</html>
+<%- include("template/footer"); %>

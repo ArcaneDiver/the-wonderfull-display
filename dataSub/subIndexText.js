@@ -5,14 +5,15 @@
 */
 
 
-var ledMatrix = require('easybotics-rpi-rgb-led-matrix');
+const ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 
-var matrix = new ledMatrix(32, 64, 1, 4);
-var fs = require('fs');
+const matrix = new ledMatrix(32, 64, 1, 4);
+const fs = require('fs');
+const path = require(`path`);
 
 while(1){
 	//leggo i dati dal file
-	const textToScroll = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/dataInText.txt', 'utf8');
+	const textToScroll = fs.readFileSync(path.resolve(__dirname, './dataInText.txt'), 'utf8');
 	const arrText = textToScroll.split("Ĭ"); //alt+300 unicode
 	const lun = Object.keys(arrText[0]).length;
 	
@@ -45,7 +46,7 @@ while(1){
 	matrix.brightness(arrText[4]);
 
 	while (x1 > (-8 * lun)) {
-		if((k % 256 == 0 ) && k != 0){ //aggiorno il quando sono a metà del buffer
+		if((k % 256 == 0 ) && k != 0){ //aggiorno il buffer quando sono a metà di esso
 			var tmp = arrText[0].slice(numTutSchermo*(i-1), numTutSchermo*i);
 			toWrite = tmp.concat(arrText[0].slice(numTutSchermo*i, numTutSchermo*(i+1)));			
 			
@@ -54,7 +55,7 @@ while(1){
 		}	
 
 		matrix.clear();	
-		matrix.drawText(x, y, toWrite , '/home/pi/serverAllNode/server/fonts/8x13.bdf', r, g, b);	
+		matrix.drawText(x, y, toWrite , path.resolve(__dirname, '../fonts/8x13.bdf'), r, g, b);	
 		matrix.update();
 
 		x--, x1--;

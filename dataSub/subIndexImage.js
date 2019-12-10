@@ -8,6 +8,7 @@
 const ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 const child = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
 
 const matrix = new ledMatrix(32, 64, 1, 4);
@@ -16,7 +17,7 @@ const timeStart = new Date().getTime();
 
 
 while (1) {
-    var dataForImageScrolling = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/dataInImage.txt', 'utf8', {}); //legge i dati per lo scorrimento
+    var dataForImageScrolling = fs.readFileSync(path.resolve(__dirname, './dataInImage.txt'), 'utf8', {}); //legge i dati per lo scorrimento
    
     var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
     const speed = arrImg[0];
@@ -38,8 +39,8 @@ while (1) {
     
     matrix.brightness(arrImg[1]); //imposto la luminosità
     
-    var numberOfFile = fs.readFileSync('/home/pi/serverAllNode/server/dataSub/numberOfFile.txt', {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
-    ;    
+    var numberOfFile = fs.readFileSync(path.resolve(__dirname, './numberOfFile.txt'), {}); //leggo il file che contiene il numero di immagini e visto che le immagini vengono salvate da input0 non aggiungo niente
+    
 
     if (parseInt(arrImg[2])) { //se è 1 nel file
 
@@ -68,34 +69,51 @@ while (1) {
             timeString = timeString.concat(hour + ':');
         }
 
-        if(minute < 10){
+        if (minute < 10) {
             timeString = timeString.concat('0' + minute);
         } else {
             timeString = timeString.concat(minute);
         }
 
-        var createImageWithTime = child.spawnSync('sudo', ['convert', '/home/pi/serverAllNode/server/img/empty.jpg', '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, '/home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']);
+        var createImageWithTime = child.spawnSync('sudo', ['convert', path.resolve(__dirname, '../img/empty.jpg'), '-gravity', 'center', '-pointsize', '30', '-size', '256x32', '+antialias', '-fill', 'green', '-annotate', '0x0+0+3', timeString, path.resolve(__dirname, `../img/input${numberOfFile}.jpg`)]);
     } else {
-
-        var removeLastDate = child.spawnSync('sudo', ['rm', './home/pi/serverAllNode/server/img/input' + numberOfFile + '.jpg']); //rimuovo l'ultimo perche senno la include lo stesso
+        try {
+            fs.unlinkSync(path.resolve(__dirname, `../img/input${numberOfFile}.jpg`)); //rimuovo l'ultimo perche senno la include lo stesso
+        } catch (_) { }
     }
     delay(1000);
 
 
     // ImageMagick https://imagemagick.org/index.php
     // Converto tutte le immagini
-    var convert = child.spawnSync('sudo', ['convert', '/home/pi/serverAllNode/server/img/input*.jpg', '+append', '-crop', '100000x32+0+0', '/home/pi/serverAllNode/server/img/converted/input.ppm']); //+append serve per concatenare le immagini
-    
-    
+    var convert = child.spawnSync('sudo', ['convert', path.resolve(__dirname, '../img/input*.jpg'), '+append', '-crop', '100000x32+0+0', path.resolve(__dirname, '../img/converted/input.ppm')]); //+append serve per concatenare le immagini
+   
+    if (convert.error) {
+        convert.output.forEach(buffer => buffer !== null ? console.log(buffer.toString()) : null);
+        continue;
+    }
+
+    // Se non ci sono immagini
+    if (!fs.existsSync(path.resolve(__dirname, "../img/converted/input.ppm")) || numberOfFile <= 0) {
+       
+        console.log("non ci sono immagini")
+
+        fs.writeFileSync(path.resolve(__dirname, "../img/converted/input.ppm"), "");
+        
+        continue;
+    }        
+
+
+
     var x = 0;
     
-    var imgBuff = fs.readFileSync('/home/pi/serverAllNode/server/img/converted/input.ppm');
+    var imgBuff = fs.readFileSync(path.resolve(__dirname, '../img/converted/input.ppm'));
     
     
     
-    var openToRead = fs.openSync('/home/pi/serverAllNode/server/img/converted/input.ppm', 'r');
+    var openToRead = fs.openSync(path.resolve(__dirname, '../img/converted/input.ppm'), 'r');
 
-    var openToWrite = fs.openSync('/home/pi/serverAllNode/server/img/converted/output.ppm', 'w');
+    var openToWrite = fs.openSync(path.resolve(__dirname, '../img/converted/output.ppm'), 'w');
 
     var i = 0, numberOfDots = 0;
     while(1){
@@ -126,7 +144,9 @@ while (1) {
     fs.close(openToRead);
     fs.close(openToWrite);
 
-    const imageBuff = fs.readFileSync("/home/pi/serverAllNode/server/img/converted/output.ppm");
+    const imageBuff = fs.readFileSync(path.resolve(__dirname, "../img/converted/output.ppm"));
+
+
     
     var width, height;
     height = 32; //questo perchè l'immagine viene tagliata automaticamente con altezza 32
@@ -164,7 +184,7 @@ while (1) {
     }
 }
 
-var clock = child.spawn('./home/pi/serverAllNode/server/dataSub/example/clock', ['--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', './fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
+var clock = child.spawn(path.resolve(__dirname, '../dataSub/example/clock'), ['--led-cols', '64', '--led-rows', '32', '--led-chain', '4', '-f', './fonts/10x20.bdf', '-b', '30', '-C', '0,255,0', '-y', '5', '-d', "%d/%m/%Y       %H:%M:%S"], {});
 
 process.once('SIGTERM', function () {
     console.log('caught');

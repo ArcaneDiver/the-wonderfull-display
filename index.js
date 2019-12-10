@@ -37,8 +37,9 @@ app.use(session({
 	secret: process.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: true,
-	cookie: { secure: process.env.NODE_ENV === `production` ? true : false }
+	cookie: { secure: false }
 }))
+
 app.use(morgan(`dev`));
 
 app.use('/image', fileUpload());
@@ -92,16 +93,7 @@ try {
 
 const metaBase64 = "data:image/png;base64,";
 
-global.iot = {
-	childSub,
-	numImg,
-	posToAdd,
-	actualMatrix,
-	actualImage,
-	metaBase64
-}
 
-console.log(iot);
 /*
 ---------------------------------------------------------Fine Inizializzazione---------------------------------------------------------
 */
@@ -109,10 +101,11 @@ console.log(iot);
 
 
 app.use((req, res, next) => {
-	console.log(req.originalUrl);
+
+	
+	console.log(req.originalUrl, "Path:", (req.originalUrl !== "/login" && req.originalUrl !== "/login_check"), "Session_token:", req.session.logged, "Redirected", !req.session.logged && (req.originalUrl !== "/login" && req.originalUrl !== "/login_check"));
 
 	if (!req.session.logged && (req.originalUrl !== "/login" && req.originalUrl !== "/login_check")) {
-		console.log("going to /login", "path", req.originalUrl !== "/login", "session_token", !req.session.logged);
 		res.status(401).redirect(`/login`);
 		
 	} else {
@@ -126,9 +119,9 @@ app.get(`/login`, (req, res) => {
 
 app.post(`/login_check`, (req, res) => {
 
-	console.log(req.body.password, "VS", process.env.PW);
+	console.log(req.body.password, "VS", process.env.PW, "Result: ", req.body.password == process.env.PW);
 
-	if (req.body.password === process.env.PW) {
+	if (req.body.password == process.env.PW) {
 		req.session.logged = true;
 		res.status(200).redirect(`/`);
 	} else {
