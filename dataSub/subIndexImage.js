@@ -96,7 +96,6 @@ while (1) {
     // Se non ci sono immagini
     if (!fs.existsSync(path.resolve(__dirname, "../img/converted/input.ppm")) || numberOfFile <= 0) {
        
-        console.log("non ci sono immagini")
 
         fs.writeFileSync(path.resolve(__dirname, "../img/converted/input.ppm"), "");
         

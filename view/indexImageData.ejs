@@ -1,6 +1,19 @@
 <%- include("template/header"); %>
-<div class="">
-    <form action="" method="POST" >
+<style>
+  
+    button.btn-outline-success {
+        width: 43px;
+        height: 43px
+    }
+
+    .uploaded-image {
+        max-width: 1000px;
+        max-height: 200px;
+    }
+
+</style>
+<div class="container">
+    <form action="" method="POST">
         <p>Inserisci la luminosità</p>
         <input type="number" name="brigImage" min=0 max=100 required>
 
@@ -25,33 +38,39 @@
             </div>
         </div>
 
-        <button style="display: block; margin: auto; margin-top: 10px" type="submit">Carica</button>
+        <button style="display: block; margin: auto; margin-top: 10px" class="btn btn-outline-primary"
+            type="submit">Aggiorna</button>
     </form>
+    <div class="container">
+        <form action="/delete" method="POST">
+            <div>
+                <div> Lista immagini attualmente caricate </div>
+                <% if(imageList.length > 0) { %>
+                    <% imageList.forEach( function (element) { %>
+                        <div class="alert alert-info">
+                            <p><%= element.name%></p>
+                            <ul style="display: inline-flex; list-style-type: none">
+                                <li>
+                                    <button type="submit" style="margin-right: 3px; border-radius: 30px;" name="remove" value="<%= element.name %>" class="btn btn-outline-danger">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </li>
+                                <li>
+                                    <img class="uploaded-image" src="<%= element.imgSrc %>">
+                                </li>
+                            </ul>
+                            <button type="submit" name="add" value="0" class="btn btn-outline-success" style="margin: auto; display: block; border-radius: 30px;">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <button type="submit" name="add" value="0" class="btn btn-outline-success"
+                        style="margin: auto; display: block; border-radius: 30px;"><i class="fas fa-plus"></i></button>
+                <% } %>
+                </div>
+        </form>
+    </div>
 </div>
-<form action="/delete" method="POST">
-    <fieldset>
-        <legend> Lista immagini attualmente caricate </legend>
-        <% if(imageList.length > 0) { %>
-        <% imageList.forEach( function (element) { %>
-        <p><%= element.name%></p>
-        <ul style="display: inline-flex; list-style-type: none">
-            <li>
-                <button type="submit" style="height: 32px; margin-right: 3px" name="remove"
-                    value="<%= element.name %>">x</button>
-            </li>
-            <li>
-                <img style="width: auto" src="<%= element.imgSrc %>">
-            </li>
-
-
-        </ul>
-        <button type="submit" name="add" value="<%= element.posNumber%>" style="margin: auto; display: block"> +
-        </button>
-        <% }) %>
-        <% } else { %>
-        <button type="submit" name="add" value="0" style="margin: auto; display: block"> + </button>
-        <% } %>
-    </fieldset>
-</form>
 
 <%- include("template/footer"); %>
