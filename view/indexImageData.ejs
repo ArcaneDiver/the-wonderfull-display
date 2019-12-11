@@ -1,7 +1,7 @@
 <%- include("template/header"); %>
 <style>
   
-    button.btn-outline-success {
+    button.btn-outline-success, button.btn-outline-danger {
         width: 43px;
         height: 43px
     }
@@ -9,6 +9,19 @@
     .uploaded-image {
         max-width: 1000px;
         max-height: 200px;
+    }
+    
+    .alert {
+        margin-top: 1rem;
+    }
+
+    .footer {
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
+    .footer-line {
+        border-top: 1px solid rgba(0,0,0, 0.3);
     }
 
 </style>
@@ -38,38 +51,44 @@
             </div>
         </div>
 
-        <button style="display: block; margin: auto; margin-top: 10px" class="btn btn-outline-primary"
-            type="submit">Aggiorna</button>
+        <button style="display: block; margin: auto; margin-top: 10px" class="btn btn-outline-primary" type="submit">
+            Aggiorna
+        </button>
     </form>
-    <div class="container">
         <form action="/delete" method="POST">
-            <div>
-                <div> Lista immagini attualmente caricate </div>
-                <% if(imageList.length > 0) { %>
-                    <% imageList.forEach( function (element) { %>
-                        <div class="alert alert-info">
-                            <p><%= element.name%></p>
-                            <ul style="display: inline-flex; list-style-type: none">
-                                <li>
-                                    <button type="submit" style="margin-right: 3px; border-radius: 30px;" name="remove" value="<%= element.name %>" class="btn btn-outline-danger">
+                <h3> Lista immagini attualmente caricate </h3>
+                <div class="container">
+
+                    <% if(imageList.length > 0) { %>
+                        <% imageList.forEach( function (element) { %>
+                            <div class="alert alert-info">
+                                <h4 class="alert-heading"><%= element.name%></h4>
+                                <hr>
+                                <div class="d-flex flex-row" style="margin-bottom: 20px;">
+                                    <button type="submit" style="margin-left: 20px; margin-right: 20px; border-radius: 30px;" name="remove" value="<%= element.name %>" class="btn btn-outline-danger">
                                         <i class="fas fa-times"></i>
                                     </button>
-                                </li>
-                                <li>
-                                    <img class="uploaded-image" src="<%= element.imgSrc %>">
-                                </li>
-                            </ul>
+                                    
+                                    <img class="uploaded-image"  src="<%= element.imgSrc %>">
+                                </div>
+                            </div>
                             <button type="submit" name="add" value="0" class="btn btn-outline-success" style="margin: auto; display: block; border-radius: 30px;">
                                 <i class="fas fa-plus"></i>
                             </button>
-                        </div>
-                    <% }) %>
-                <% } else { %>
-                    <button type="submit" name="add" value="0" class="btn btn-outline-success"
-                        style="margin: auto; display: block; border-radius: 30px;"><i class="fas fa-plus"></i></button>
-                <% } %>
+
+                        <% }) %>
+                    <% } else { %>
+                        <button type="submit" name="add" value="0" class="btn btn-outline-success"
+                            style="margin: auto; display: block; border-radius: 30px;"><i class="fas fa-plus"></i></button>
+                    <% } %>
                 </div>
         </form>
+    </div>
+</div>
+<div class="footer">
+    <hr class="footer-line">
+    <div class="text-center">
+        Michele Della Mea
     </div>
 </div>
 

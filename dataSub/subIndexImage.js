@@ -9,7 +9,7 @@ const ledMatrix = require('easybotics-rpi-rgb-led-matrix');
 const child = require('child_process');
 const fs = require('fs');
 const path = require('path');
-
+const jpegDecode = require(`jpeg-js`).decode;
 
 const matrix = new ledMatrix(32, 64, 1, 4);
 
@@ -17,6 +17,10 @@ const timeStart = new Date().getTime();
 
 
 while (1) {
+    // Svuoto la matrice
+    matrix.clear();
+    matrix.update();
+
     var dataForImageScrolling = fs.readFileSync(path.resolve(__dirname, './dataInImage.txt'), 'utf8', {}); //legge i dati per lo scorrimento
    
     var arrImg = dataForImageScrolling.split("Ĭ"); //alt+300 unicode
@@ -89,14 +93,13 @@ while (1) {
     var convert = child.spawnSync('sudo', ['convert', path.resolve(__dirname, '../img/input*.jpg'), '+append', '-crop', '100000x32+0+0', path.resolve(__dirname, '../img/converted/input.ppm')]); //+append serve per concatenare le immagini
    
     if (convert.error) {
-        convert.output.forEach(buffer => buffer !== null ? console.log(buffer.toString()) : null);
+        convert.output.forEach(buffer => buffer !== null ? console.error(buffer.toString()) : null);
         continue;
     }
 
     // Se non ci sono immagini
     if (!fs.existsSync(path.resolve(__dirname, "../img/converted/input.ppm")) || numberOfFile <= 0) {
        
-
         fs.writeFileSync(path.resolve(__dirname, "../img/converted/input.ppm"), "");
         
         continue;
