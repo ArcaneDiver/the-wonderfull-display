@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start:prod": "sudo pm2 start index.js --name display",
+    "start:prod": "npx cross-env pm2 start index.js",
     "start:dev": "sudo node index.js",
-    "start:image": "sudo node dataSub/subIndexImage.js",
-    "start:prod": "npx cross-env pm2 start index.js"
+    "start:image": "sudo node dataSub/subIndexImage.js"
   },
   "keywords": [
     "rpiledmatrix"
@@ -26,7 +25,8 @@
     "image-convert": "^0.1.33",
     "image-to-rgba-matrix": "^1.0.0",
     "jimp": "^0.9.3",
-    "morgan": "^1.9.1"
+    "morgan": "^1.9.1",
+    "uuid": "^3.3.3"
   },
   "devDependencies": {
     "cross-env": "^6.0.3",

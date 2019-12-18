@@ -1,90 +1,147 @@
 <%- include("template/header"); %>
 <style>
-  
-    button.btn-outline-success, button.btn-outline-danger {
-        width: 43px;
-        height: 43px
-    }
+	body {
+		font-family: apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	}
 
-    .uploaded-image {
-        max-width: 1000px;
-        max-height: 200px;
-    }
-    
-    .alert {
-        margin-top: 1rem;
-    }
+	button.btn-outline-success,
+	button.btn-outline-danger {
+		width: 43px;
+		height: 43px
+	}
 
-    .footer {
-        margin-top: 20px;
-        margin-bottom: 10px;
-    }
+	.uploaded-image {
+		max-width: 1000px;
+		max-height: 200px;
+	}
 
-    .footer-line {
-        border-top: 1px solid rgba(0,0,0, 0.3);
-    }
+	.alert {
+		margin-top: 1rem;
+	}
 
+	.footer {
+		margin-top: 20px;
+		margin-bottom: 10px;
+	}
+
+	.footer-line {
+		border-top: 1px solid rgba(0, 0, 0, 0.3);
+	}
 </style>
 <div class="container">
-    <form action="" method="POST">
-        <p>Inserisci la luminosità</p>
-        <input type="number" name="brigImage" min=0 max=100 required>
+	<form action="" method="POST" style="padding: 2em">
+		<div class="row" style="margin: 1em">
+			<div class="col text-center">
+				<div class="form-group">
+					<label for="bright">Inserisci la luminosità</label>
+					<input class="form-control w-100" id="bright" type="number" name="brigImage" min=0 max=100
+						required>
+				</div>
+			</div>
+			<div class="col">
+				<p>Selezionare velocità di scorrimento</p>
+				<div class="custom-control custom-radio">
+					<input type="radio" name="speedImage" value="max" class="custom-control-input"
+						id="vMax">
+					<label class="custom-control-label" for="vMax">Velocità massima</label>
+				</div>
+				<div class="custom-control custom-radio">
+					<input type="radio" name="speedImage" value="medium" id="vMed"
+						class="custom-control-input" checked>
+					<label for="vMed" class="custom-control-label">Velocità media</label>
+				</div>
 
-        <p>Selezionare velocità di scorrimento</p>
+				<div class="custom-control custom-radio">
+					<input type="radio" name="speedImage" value="min" id="vMin"
+						class="custom-control-input">
+					<label for="vMin" class="custom-control-label">Velocità bassa</label>
+				</div>
 
-        <input type="radio" name="speedImage" value="max">Velocità massima<br>
-        <input type="radio" name="speedImage" value="medium" checked>Velocità media<br>
-        <input type="radio" name="speedImage" value="min">Velocità bassa<br>
+			</div>
+		</div>
+		<div class="row" style="margin: 1em; margin-top: 3.5em">
+			<div class="col">
+				<div class="custom-control custom-switch">
+					<input type="checkbox" class="custom-control-input" id="setClock" name="selectClock">
+					<label for="setClock" class="custom-control-label">Aggiungere data e ora alla fine?</label>
+				</div>
+			</div>
 
-        <input type="checkbox" name="selectClock">Aggiungere data e ora alla fine?<br>
+			<div class="col">
+				<div>Numero di ore e minuti per cui devono scorrere le immagini, <br> alla fine del tempo parte l`orologio</div>
+				<div class="row">
+					<div class="col" style="padding: 0">
+						<div class="form-group ">
+							<input type="text" name="hours" class="form-control" id="hours" aria-describedby="hoursHelp" placeholder="0 per far scorrere all infinito" required>
+							<small class="form-text text-muted" id="hoursHelp">Ore</small>
+						</div>
+					</div>
+					<div class="col">
+						<div class="form-group">
+							<input type="text" name="minutes" class="form-control" placeholder="0 per far scorrere all infinito" id="mins" aria-describedby="minsHelp" required>
+							<small class="form-text text-muted" id="minsHelp">Minuti</small >
+						</div>
+					</div>
+				</div>
+				
+			</div>
+				
+				
+		</div>
 
-        <div style="display: inline-flex; margin: auto; margin-top: 3px">
-            <span>Inserire 0 e 0 per far scorrere all'infinito</span>
-            <div style="display: inline-flex;">
-                <input type="text" name="hours" required>
-                <span>Ore</span>
-            </div>
-            <p style="margin: auto; margin-left: 15px; margin-right: 15px">:</p>
-            <div style="display: inline-flex;">
-                <input type="text" name="minutes" required>
-                <span>Minuti</span>
-            </div>
-        </div>
 
-        <button style="display: block; margin: auto; margin-top: 10px" class="btn btn-outline-primary" type="submit">
-            Aggiorna
-        </button>
-    </form>
-        <form action="/delete" method="POST">
-                <h3> Lista immagini attualmente caricate </h3>
-                <div class="container">
+		
 
-                    <% if(imageList.length > 0) { %>
-                        <% imageList.forEach( function (element) { %>
-                            <div class="alert alert-info">
-                                <h4 class="alert-heading"><%= element.name%></h4>
-                                <hr>
-                                <div class="d-flex flex-row" style="margin-bottom: 20px;">
-                                    <button type="submit" style="margin-left: 20px; margin-right: 20px; border-radius: 30px;" name="remove" value="<%= element.name %>" class="btn btn-outline-danger">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    
-                                    <img class="uploaded-image"  src="<%= element.imgSrc %>">
-                                </div>
-                            </div>
-                            <button type="submit" name="add" value="0" class="btn btn-outline-success" style="margin: auto; display: block; border-radius: 30px;">
-                                <i class="fas fa-plus"></i>
-                            </button>
+		<button style="display: block; margin: auto; margin-top: 10px" class="btn btn-outline-primary"
+			type="submit">
+			Aggiorna
+		</button>
+	</form>
 
-                        <% }) %>
-                    <% } else { %>
-                        <button type="submit" name="add" value="0" class="btn btn-outline-success"
-                            style="margin: auto; display: block; border-radius: 30px;"><i class="fas fa-plus"></i></button>
-                    <% } %>
-                </div>
-        </form>
-    </div>
+	<form action="/delete" method="POST">
+		<div class="container">
+		<h3> Lista immagini attualmente caricate </h3>
+
+			<% if(imageList.length > 0) { %>
+				<% imageList.forEach( function (element) { %>
+					<div class="alert alert-info">
+						<h4 class="alert-heading"><%= element.name%></h4>
+						<hr>
+						<div class="d-flex flex-row" style="margin-bottom: 20px;">
+							<button type="submit"
+								style="margin-left: 20px; margin-right: 20px; border-radius: 30px;"
+								name="remove" value="<%= element.uuid %>"
+								class="btn btn-outline-danger">
+								<i class="fas fa-times"></i>
+							</button>
+
+							<img class="uploaded-image" src="<%= element.imgSrc %>">
+						</div>
+					</div>
+					<button type="submit" name="add" value="<%= element.posNumber %>" class="btn btn-outline-success"
+						style="margin: auto; display: block; border-radius: 30px;">
+						<i class="fas fa-plus"></i>
+					</button>
+
+				<% }) %>
+			<% } else { %>
+				<button type="submit" name="add" value="0" class="btn btn-outline-success"
+				style="margin: auto; display: block; border-radius: 30px;">
+					<i class="fas fa-plus"></i>
+				</button>
+			<% } %>
+		</div>
+	</form>
 </div>
 
+<script>
+	$(function () {
+		$("#setClock").change(function (e) {
+			if ($("#setClock").val()) {
+
+			}
+		})
+	})
+</script>
 
 <%- include("template/footer"); %>
