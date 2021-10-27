@@ -11,6 +11,8 @@
 
 #include <tuple>
 #include <map>
+#include <vector>
+#include <string>
 
 #include <node.h>
 #include <node_object_wrap.h>
@@ -55,7 +57,7 @@ class LedMatrix : public node::ObjectWrap
 	void Update		(void);
 
 	protected:
-	LedMatrix (int rows , int cols , int chained_displays , int parallel_displays, int brightness, const char* mapping, const char* rgbSeq);
+	LedMatrix (int rows , int cols , int chained_displays , int parallel_displays, int brightness, const char* mapping, const char* rgbSeq, std::vector<std::string> flags);
 
 	virtual ~LedMatrix (void);
 
