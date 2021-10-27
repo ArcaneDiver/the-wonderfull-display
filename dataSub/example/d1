@@ -1,2 +1,0 @@
-sudo ./demo --led-cols=64 --led-chain=4  -D 1 runtext.ppm  --led-pwm-lsb-nanoseconds=50 --led-slowdown-gpio=1
-sudo ./demo --led-cols=64 --led-chain=4  -D 1 runtext.ppm  --led-pwm-lsb-nanoseconds=50 --led-slowdown-gpio=2
