@@ -2,3 +2,5 @@ node_modules/
 dataImage.json
 img/converted/input.jpg
 img/input*.jpg
+
+.env
